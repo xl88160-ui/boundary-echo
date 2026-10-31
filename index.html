@@ -1,102 +1,138 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
+<html lang="zh-CN"><head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#0b1118"><title>边界回响 · BOUNDARY ECHO</title>
+<meta name="theme-color" content="#080d14"><title>边界回响 | BOUNDARY ECHO</title>
 <style>
-:root{color-scheme:dark;--bg:#0b1118;--panel:#111c27;--line:#294052;--cyan:#65e6df;--gold:#f3c875;--red:#ff6e76}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,"Microsoft Yahei",sans-serif;touch-action:none;color:#e8f0f3}
-#game{position:fixed;inset:0;width:100%;height:100%;display:block}
-.hud{position:fixed;inset:0;pointer-events:none;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
-.top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:10px;gap:8px}.brand{font-size:11px;letter-spacing:3px;color:var(--cyan);font-weight:800}.stats{display:flex;gap:7px}.pill{background:#101c27d9;border:1px solid #345063;border-radius:9px;padding:7px 10px;font-size:12px;backdrop-filter:blur(8px)}
-.health{width:min(210px,42vw);height:7px;background:#263744;border-radius:8px;overflow:hidden;margin-top:7px}.health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#59d9c7,#c2ed9a)}
-.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 12px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:end}
-.control{pointer-events:auto;display:flex;gap:9px;align-items:end}.stick{width:112px;height:112px;border:1px solid #76909a88;background:#182a38a8;border-radius:50%;position:relative;touch-action:none}.stick:after{content:"";position:absolute;width:42px;height:42px;border-radius:50%;background:#8bb8bd77;border:1px solid #b9e7e5;left:50%;top:50%;transform:translate(-50%,-50%)}.stick span{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;color:#c1d7d9;letter-spacing:1px}
-.actions{display:flex;gap:8px;align-items:end}.btn{pointer-events:auto;border:1px solid #6b8a9b;background:#142633dd;color:#eaf6f5;border-radius:50%;width:58px;height:58px;font-weight:800;font-size:11px;touch-action:none;box-shadow:0 4px 18px #0005}.btn.fire{width:72px;height:72px;background:#17444b;border-color:#65e6df;color:#9dfff3}.btn.skill{border-color:#b99a5e;color:#f3d18a}.btn:active{transform:scale(.94)}
-#overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(120deg,#08121deF,#102431d9);padding:20px;z-index:5}
-.card{width:min(560px,100%);max-height:90dvh;overflow:auto;background:#101d28f2;border:1px solid #365263;border-radius:18px;padding:22px;box-shadow:0 25px 90px #0009}
-.kicker{font-size:10px;letter-spacing:4px;color:var(--cyan);font-weight:800}.title{font-size:clamp(30px,7vw,48px);line-height:1.05;margin:8px 0}.sub{color:#9fb4bf;font-size:13px;line-height:1.7}.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.hero{border:1px solid #304958;border-radius:12px;padding:11px;background:#152531;min-height:84px;text-align:left;color:#e8f0f3}.hero.active{border-color:var(--cyan);background:#17363b}.hero b{display:block;font-size:13px}.hero small{color:#9bb0bb;font-size:10px}.primary{border:0;border-radius:10px;background:var(--cyan);color:#092027;font-weight:900;padding:14px 20px;width:100%;font-size:15px}.hint{font-size:11px;color:#91a6b0;margin-top:12px;line-height:1.7}
-#toast{position:fixed;top:22%;left:50%;transform:translateX(-50%);background:#132a34eF;border:1px solid #5a8990;border-radius:9px;padding:9px 14px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
-@media(min-width:760px){.stick{width:130px;height:130px}.btn{width:64px;height:64px}.btn.fire{width:82px;height:82px}.card{padding:28px}}
-@media(max-height:520px){.stick{width:82px;height:82px}.stick:after{width:34px;height:34px}.btn{width:48px;height:48px}.btn.fire{width:60px;height:60px}.bottom{bottom:7px}.card{max-height:94dvh;padding:14px}.heroes{margin:10px 0}.hero{min-height:62px;padding:7px}}
-</style></head>
-<body>
+:root{--ice:#8af4ef;--gold:#eac887;--red:#ff6577}*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080d14;color:#eaf4f4;font-family:system-ui,-apple-system,"Microsoft Yahei",sans-serif;touch-action:none}#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+#hud{position:fixed;inset:0;pointer-events:none;padding:env(safe-area-inset-top) 15px env(safe-area-inset-bottom)}.top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:10px}.brand{font-size:10px;letter-spacing:4px;color:var(--ice);font-weight:900;text-shadow:0 0 15px #4adbd5}.health{height:5px;width:min(210px,42vw);background:#28343c;margin-top:9px;overflow:hidden}.health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#4ed6c5,#d9e6a0);box-shadow:0 0 12px #65e6df}.heroTag{font-size:10px;color:#c3d4d8;margin-top:5px;letter-spacing:1px}.stats{display:flex;gap:6px}.pill{background:#0a141dcc;border:1px solid #3a5861;padding:7px 9px;font-size:11px;backdrop-filter:blur(8px);clip-path:polygon(0 0,100% 0,100% 75%,88% 100%,0 100%)}
+.bottom{position:absolute;left:14px;right:14px;bottom:calc(env(safe-area-inset-bottom) + 12px);display:flex;justify-content:space-between;align-items:end}.stick{width:112px;height:112px;border:1px solid #7ed9d288;border-radius:50%;background:radial-gradient(circle,#18323d99,#09141dcc);position:relative;pointer-events:auto;touch-action:none;box-shadow:0 0 25px #4bd8d522,inset 0 0 22px #6be5df22}.stick:after{content:"";position:absolute;width:42px;height:42px;left:50%;top:50%;transform:translate(-50%,-50%);border-radius:50%;background:linear-gradient(145deg,#b4fff3aa,#3c778b99);border:1px solid #b6fff4;box-shadow:0 0 15px #6af0e5}.stick span{position:absolute;inset:0;display:grid;place-items:center;font-size:8px;letter-spacing:2px;color:#d8ffff}
+.actions{display:flex;gap:8px;align-items:end}.btn{pointer-events:auto;width:57px;height:57px;border-radius:50%;border:1px solid #668a91;background:linear-gradient(145deg,#213844ee,#0b1721ee);color:#eafafa;font-size:10px;font-weight:900;touch-action:none;box-shadow:0 4px 18px #0008,inset 0 0 12px #8ce9e522}.btn.skill{border-color:#c6a66d;color:#ffe0a2}.btn.fire{width:72px;height:72px;border:1px solid #8df8e9;background:radial-gradient(circle at 35% 30%,#367b79,#123b44);color:#cffff9;box-shadow:0 0 22px #55e5d855}
+#overlay{position:fixed;inset:0;z-index:5;display:grid;place-items:center;padding:18px;background:radial-gradient(ellipse at 68% 44%,#19353b99 0%,#0b141beF 52%,#060a10 100%);overflow:auto}.card{width:min(720px,100%);max-height:94dvh;overflow:auto;border:1px solid #45616a;background:linear-gradient(135deg,#101c25f2,#0b121bf5);box-shadow:0 25px 100px #000c;position:relative;padding:clamp(17px,4vw,30px);clip-path:polygon(0 0,97% 0,100% 4%,100% 100%,3% 100%,0 96%)}
+.card:before{content:"";position:absolute;top:0;left:0;width:45%;height:2px;background:linear-gradient(90deg,var(--ice),transparent);box-shadow:0 0 18px var(--ice)}
+.kicker{font-size:10px;letter-spacing:5px;color:var(--ice);font-weight:900}.title{font-size:clamp(35px,8vw,66px);font-weight:950;letter-spacing:2px;line-height:1;margin:10px 0 7px;text-shadow:0 0 28px #5be0d533}.sub{color:#a9bec4;font-size:12px;line-height:1.8;max-width:520px}
+.selection{display:grid;grid-template-columns:1.1fr 1fr;gap:15px;margin-top:18px}.preview{min-height:190px;position:relative;border:1px solid #304d59;background:radial-gradient(ellipse at 50% 52%,#31545c77,#0b1720 68%);overflow:hidden}.preview:after{content:"UNIT HOLOGRAM / 07";position:absolute;bottom:8px;left:10px;font-size:8px;letter-spacing:2px;color:#8caeb2}.heroInfo{display:flex;flex-direction:column;justify-content:center}.heroName{font-size:27px;font-weight:900;letter-spacing:2px}.role{font-size:10px;color:var(--gold);letter-spacing:3px;margin:3px 0 9px}.desc{font-size:11px;color:#9eb4bc;line-height:1.7}.statline{font-size:9px;color:#8aa5ae;letter-spacing:1px;margin-top:10px}.statbar{height:3px;background:#253942;margin:5px 0 8px}.statbar i{display:block;height:100%;background:linear-gradient(90deg,#4bbab5,#d5d9a2)}
+.heroes{display:grid;grid-template-columns:repeat(6,1fr);gap:6px;margin-top:13px}.hero{background:#111f29;border:1px solid #304a55;color:#dcebed;padding:9px 4px;text-align:center;min-width:0}.hero b{display:block;font-size:11px}.hero small{font-size:8px;color:#829ba4}.hero.active{border-color:var(--ice);background:#17333a;box-shadow:inset 0 0 15px #5ce2d522}
+.primary{width:100%;margin-top:16px;padding:14px;background:linear-gradient(100deg,#b9f4e9,#64cfc9);border:0;color:#092027;font-weight:950;font-size:14px;letter-spacing:3px;clip-path:polygon(0 0,97% 0,100% 25%,100% 100%,3% 100%,0 75%)}
+.hint{font-size:9px;color:#718b94;line-height:1.7;margin-top:10px}#toast{position:fixed;z-index:7;top:18%;left:50%;transform:translateX(-50%);padding:10px 18px;background:#10262eeF;border:1px solid #80e7df;color:#dffffa;font-size:11px;letter-spacing:1px;opacity:0;transition:opacity .2s;pointer-events:none;box-shadow:0 0 25px #5ce2d533}
+@media(max-width:600px){.selection{grid-template-columns:1fr 1fr;gap:9px}.preview{min-height:155px}.heroes{grid-template-columns:repeat(3,1fr)}.hero{padding:8px 3px}.heroName{font-size:21px}.card{padding:17px}.sub{font-size:11px}}
+@media(max-height:540px){.stick{width:80px;height:80px}.stick:after{width:32px;height:32px}.btn{width:46px;height:46px}.btn.fire{width:59px;height:59px}.card{max-height:98dvh;padding:12px}.selection{margin-top:8px}.preview{min-height:115px}.heroes{margin-top:7px}.primary{margin-top:8px;padding:10px}}
+</style></head><body>
 <canvas id="game"></canvas>
-<div class="hud" id="hud" hidden>
- <div class="top"><div><div class="brand">BOUNDARY ECHO / 边界回响</div><div class="health"><i id="hpbar"></i></div><div style="font-size:10px;color:#a9bdc4;margin-top:4px" id="heroLabel">夜枭 · 突击型</div></div><div class="stats"><div class="pill">击倒 <b id="kills">0</b></div><div class="pill">波次 <b id="wave">1</b></div><div class="pill">芯片 <b id="chips">0</b></div></div></div>
- <div class="bottom"><div class="control"><div class="stick" id="move"><span>MOVE</span></div></div><div class="actions"><button class="btn skill" id="dash">闪避</button><button class="btn skill" id="skill">技能</button><button class="btn fire" id="fire">射击</button></div></div>
-</div>
+<div id="hud" hidden><div class="top"><div><div class="brand">BOUNDARY ECHO // FRONTIER WAR</div><div class="health"><i id="hpbar"></i></div><div class="heroTag" id="heroLabel">NOCT / 夜枭</div></div><div class="stats"><div class="pill">击倒 <b id="kills">0</b></div><div class="pill">波次 <b id="wave">01</b></div><div class="pill">能源 <b id="chips">0</b></div></div></div><div class="bottom"><div class="stick" id="move"><span>MOVE</span></div><div class="actions"><button class="btn skill" id="dash">相移</button><button class="btn skill" id="skill">战技</button><button class="btn fire" id="fire">开火</button></div></div></div>
 <div id="toast"></div>
-<div id="overlay"><div class="card">
-<div class="kicker">TACTICAL ARENA · MOBILE PROTOTYPE</div><div class="title">边界回响</div><div class="sub">在失控边境争夺能源核心。选择你的作战单位，在不断增强的敌方攻势中生存下来。先练好走位，再找准输出窗口。</div>
-<div style="margin-top:18px;font-size:12px;color:#d6e7e9">选择作战单位</div><div class="heroes" id="heroes"></div>
-<button class="primary" id="start">进入战区</button>
-<div class="hint">操作：左侧摇杆移动 · 右侧按钮射击 / 技能 / 闪避。电脑可用 WASD 移动、鼠标瞄准、左键射击、空格闪避、E 释放技能。当前版本为本地人机试玩，在线房间正在后续开发。</div>
-</div></div>
+<div id="overlay"><div class="card"><div class="kicker">ORBITAL FRONTIER / 战术档案 09</div><div class="title">边界回响</div><div class="sub">边境防线已经崩溃。穿上战甲，深入失落的轨道遗迹，夺回能源核心。选择你的战甲配置——每一套都有独立的战斗节奏。</div>
+<div class="selection"><div class="preview"><canvas id="preview" style="width:100%;height:100%;position:absolute;inset:0"></canvas></div><div class="heroInfo"><div class="heroName" id="heroName">夜枭 / NOCT</div><div class="role" id="heroRole">ASSAULT EXOFRAME</div><div class="desc" id="heroDesc">高速突入，近距离爆发。擅长快速切入敌阵并完成处决。</div><div class="statline">火力</div><div class="statbar"><i id="statD" style="width:78%"></i></div><div class="statline">机动</div><div class="statbar"><i id="statS" style="width:88%"></i></div><div class="statline">装甲</div><div class="statbar"><i id="statH" style="width:52%"></i></div></div></div>
+<div class="heroes" id="heroes"></div><button class="primary" id="start">部署战甲　/　进入战区</button><div class="hint">手机：左侧摇杆移动，右侧开火 / 战技 / 相移。电脑：WASD 移动、鼠标瞄准射击、空格相移、E 战技。当前为单机战斗原型；联机与装备构筑将在后续版本加入。</div></div></div>
 <script>
 (()=>{
-const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
-let W=0,H=0,dpr=1,active=false,last=0,player,bullets=[],foes=[],particles=[],kills=0,wave=1,chips=0,spawn=0,selected=0,aim={x:1,y:0},move={x:0,y:0},keys={},mouse={x:0,y:0,down:false};
-const heroes=[
-{name:'夜枭',role:'突击刺客',desc:'高爆发 · 短位移',hp:100,speed:220,damage:25,skill:'影袭'},
-{name:'重锤',role:'重装前线',desc:'高生命 · 范围震荡',hp:155,speed:165,damage:19,skill:'震荡波'},
-{name:'幻影',role:'游击渗透',desc:'高机动 · 连续突袭',hp:95,speed:245,damage:17,skill:'相位步'},
-{name:'磁暴',role:'范围压制',desc:'持续伤害 · 链式电弧',hp:110,speed:185,damage:15,skill:'电磁脉冲'},
-{name:'猎隼',role:'远程火力',desc:'远距离 · 稳定输出',hp:105,speed:180,damage:22,skill:'穿透弹'},
-{name:'医官',role:'支援控制',desc:'恢复 · 战场续航',hp:125,speed:175,damage:16,skill:'战地急救'}
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d'),preview=document.getElementById('preview'),pctx=preview.getContext('2d');
+let W=0,H=0,D=1,active=false,last=0,clock=0,shake=0,player,bullets=[],foes=[],particles=[],rings=[],texts=[],kills=0,wave=1,chips=0,spawn=0,selected=0,aim={x:1,y:0},move={x:0,y:0},keys={},mouse={x:0,y:0,down:false},firing=false,touchAim=false;
+const units=[
+{name:'夜枭',en:'NOCT',role:'ASSAULT EXOFRAME',desc:'高速突入，近距离爆发。擅长快速切入敌阵并完成处决。',hp:105,speed:228,damage:26,color:'#70e9e2',dark:'#1b4b54',accent:'#e3c88c',d:82,s:92,h:52,skill:'影刃风暴'},
+{name:'重锤',en:'BASTION',role:'SIEGE EXOFRAME',desc:'重型攻城战甲。正面承伤，释放冲击波粉碎周围目标。',hp:175,speed:158,damage:21,color:'#e3bd78',dark:'#51402d',accent:'#fff0c2',d:72,s:48,h:98,skill:'地裂冲击'},
+{name:'幻影',en:'WRAITH',role:'GHOST EXOFRAME',desc:'轻型隐袭战甲。相位闪现、残影突袭，擅长绕后猎杀。',hp:95,speed:252,damage:20,color:'#b89aff',dark:'#382e65',accent:'#e9dfff',d:76,s:100,h:44,skill:'虚空裂隙'},
+{name:'磁暴',en:'VOLTAR',role:'ARC EXOFRAME',desc:'电弧控制战甲。将电荷注入敌群，造成连锁范围伤害。',hp:118,speed:190,damage:17,color:'#79aaff',dark:'#203e70',accent:'#b7e7ff',d:70,s:68,h:65,skill:'雷暴领域'},
+{name:'猎隼',en:'FALCON',role:'RANGER EXOFRAME',desc:'远程狙击战甲。高精度弹道与穿透火力，持续压制战场。',hp:112,speed:188,damage:25,color:'#e6a66e',dark:'#60402d',accent:'#ffe1b1',d:94,s:65,h:58,skill:'轨道穿刺'},
+{name:'医官',en:'SERAPH',role:'SUPPORT EXOFRAME',desc:'圣疗支援战甲。展开能量翼场，修复装甲并灼烧近身敌人。',hp:140,speed:178,damage:18,color:'#a4ead1',dark:'#285b53',accent:'#f1e3ba',d:62,s:60,h:78,skill:'圣光回响'}
 ];
 const $=id=>document.getElementById(id);
-heroes.forEach((h,i)=>{let b=document.createElement('button');b.className='hero'+(i===0?' active':'');b.innerHTML='<b>'+h.name+'</b><small>'+h.role+'<br>'+h.desc+'</small>';b.onclick=()=>{selected=i;document.querySelectorAll('.hero').forEach((x,j)=>x.classList.toggle('active',j===i))};$('heroes').appendChild(b)});
-function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
-addEventListener('resize',resize);resize();
-function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').style.opacity=0,1300)}
-function start(){const h=heroes[selected];player={x:W/2,y:H/2,r:13,hp:h.hp,max:h.hp,speed:h.speed,damage:h.damage,cd:0,skillCd:0,dashCd:0,inv:0};bullets=[];foes=[];particles=[];kills=0;wave=1;chips=0;spawn=0;active=true;$('overlay').style.display='none';$('hud').hidden=false;$('heroLabel').textContent=h.name+' · '+h.role;last=performance.now();requestAnimationFrame(loop);toast('任务开始：守住能源核心')}
+function resize(){D=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*D;canvas.height=H*D;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(D,0,0,D,0,0);let r=preview.getBoundingClientRect();preview.width=Math.max(1,r.width*D);preview.height=Math.max(1,r.height*D);pctx.setTransform(D,0,0,D,0,0)}addEventListener('resize',resize);
+function poly(c,pts,fill,stroke='#101820',lw=1){c.beginPath();c.moveTo(pts[0][0],pts[0][1]);for(let i=1;i<pts.length;i++)c.lineTo(pts[i][0],pts[i][1]);c.closePath();if(fill){c.fillStyle=fill;c.fill()}if(stroke){c.strokeStyle=stroke;c.lineWidth=lw;c.stroke()}}
+function glow(c,x,y,r,color,alpha=1){c.save();c.globalAlpha=alpha;let g=c.createRadialGradient(x,y,0,x,y,r);g.addColorStop(0,color);g.addColorStop(1,'transparent');c.fillStyle=g;c.beginPath();c.arc(x,y,r,0,Math.PI*2);c.fill();c.restore()}
+function drawFrame(c,x,y,scale,angle,u,t,hero=true){
+ c.save();c.translate(x,y);c.rotate(angle);c.scale(scale,scale);
+ let bob=Math.sin(t*7)*1.3, pulse=.65+.35*Math.sin(t*5);
+ // animated energy mantle / back fins
+ c.save();c.globalAlpha=.75;for(let side of [-1,1]){c.save();c.scale(1,side);poly(c,[[-7,-5],[-25,-18+Math.sin(t*4)*4],[-43,-37+Math.sin(t*3+1)*5],[-35,-8],[-17,5]],u.dark,'#111a25',1.5);poly(c,[[-12,-8],[-31,-27+Math.sin(t*4)*4],[-37,-17],[-17,4]],u.color,null);c.strokeStyle=u.accent;c.lineWidth=1.2;c.beginPath();c.moveTo(-14,-7);c.lineTo(-35,-25+Math.sin(t*4)*4);c.stroke();c.restore()}c.restore();
+ // legs with stride
+ let stride=Math.sin(t*12)*3;
+ poly(c,[[-8,7],[-2,9+stride],[-5,25+stride],[-12,26+stride],[-15,19+stride]],'#263843','#0b1118',2);
+ poly(c,[[2,9], [9,7-stride],[14,20-stride],[8,27-stride],[2,23-stride]],'#304653','#0b1118',2);
+ poly(c,[[-16,24+stride],[-4,24+stride],[-2,31+stride],[-18,31+stride]],u.dark,'#0b1118',1.5);
+ poly(c,[[4,24-stride],[15,21-stride],[21,29-stride],[6,32-stride]],u.dark,'#0b1118',1.5);
+ // torso silhouette and segmented chest
+ poly(c,[[-12,-13],[-10,-22],[-5,-27],[7,-26],[13,-17],[12,5],[5,15],[-8,14],[-14,3]],u.dark,'#090f17',2);
+ poly(c,[[-10,-18],[-5,-24],[7,-23],[11,-15],[5,-7],[-7,-8]],u.color,'#101b23',1.4);
+ poly(c,[[-8,-8],[7,-7],[10,5],[3,13],[-9,10],[-13,1]],'#263f4a','#0b1118',1.4);
+ poly(c,[[-4,-5],[4,-5],[7,5],[0,9],[-6,4]],u.accent,'#19242b',1);
+ glow(c,0,0,13,u.color,.2+.14*pulse);
+ // shoulders: oversized layered pauldrons
+ for(let side of [-1,1]){c.save();c.scale(1,side);poly(c,[[-12,-16],[-22,-20],[-29,-13],[-24,-3],[-12,-4],[-7,-10]],u.color,'#0b1118',2);poly(c,[[-20,-17],[-27,-13],[-23,-7],[-15,-8]],u.accent,'#16232a',1);poly(c,[[-22,-6],[-14,-4],[-12,2],[-20,0]],u.dark,null);c.restore()}
+ // arms and gauntlets
+ poly(c,[[-18,-10],[-24,-6],[-26,4],[-20,8],[-14,1]],'#344d59','#0a1118',1.6);
+ poly(c,[[17,-10],[23,-5],[27,5],[20,9],[14,1]],'#344d59','#0a1118',1.6);
+ // helmet, crest horns
+ poly(c,[[-9,-23],[-8,-32],[-3,-38],[5,-38],[11,-31],[10,-22],[4,-17],[-6,-18]],u.color,'#071017',2);
+ poly(c,[[-7,-29],[-3,-35],[6,-34],[9,-28],[3,-24],[-6,-25]],'#172d39','#7fa9a8',1);
+ poly(c,[[-5,-28],[5,-28],[3,-25],[-4,-25]],u.accent,null);
+ poly(c,[[-7,-33],[-15,-41],[-11,-29]],u.accent,'#0b1118',1);
+ poly(c,[[7,-33],[15,-41],[11,-28]],u.accent,'#0b1118',1);
+ // weapon / blade to facing direction
+ if(hero){poly(c,[[16,-5],[27,-7],[35,-4],[33,1],[22,3],[17,2]],'#647b85','#0b1118',1.5);poly(c,[[31,-5],[49,-7],[55,-4],[51,0],[33,1]],u.accent,'#111a20',1);glow(c,47,-3,12,u.color,.5)}
+ // glowing reactor on spine
+ c.beginPath();c.arc(-1,1,3.1,0,Math.PI*2);c.fillStyle=u.accent;c.fill();glow(c,-1,1,9,u.color,.45);
+ c.restore();
+}
+function drawPreview(){let r=preview.getBoundingClientRect(),w=r.width,h=r.height,u=units[selected];pctx.clearRect(0,0,w,h);glow(pctx,w*.5,h*.55,95,u.color,.28);pctx.strokeStyle='#41636b55';pctx.lineWidth=1;for(let i=0;i<4;i++){pctx.beginPath();pctx.ellipse(w*.5,h*.57,28+i*19,13+i*9,0,0,Math.PI*2);pctx.stroke()}drawFrame(pctx,w*.5,h*.59,1.7,Math.sin(clock*.5)*.08,u,clock,true);pctx.fillStyle=u.color;pctx.globalAlpha=.7;pctx.font='8px sans-serif';pctx.fillText('REACTOR // ONLINE',10,17);pctx.globalAlpha=1}
+function selectUnit(i){selected=i;document.querySelectorAll('.hero').forEach((b,j)=>b.classList.toggle('active',i===j));let u=units[i];$('heroName').textContent=u.name+' / '+u.en;$('heroRole').textContent=u.role;$('heroDesc').textContent=u.desc;$('statD').style.width=u.d+'%';$('statS').style.width=u.s+'%';$('statH').style.width=u.h+'%';drawPreview()}
+units.forEach((u,i)=>{let b=document.createElement('button');b.className='hero'+(i===0?' active':'');b.innerHTML='<b>'+u.name+'</b><small>'+u.en+'</small>';b.onclick=()=>selectUnit(i);$('heroes').appendChild(b)});
+function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;clearTimeout(toast.timer);toast.timer=setTimeout(()=>$('toast').style.opacity=0,1500)}
+function start(){let u=units[selected];player={x:W/2,y:H/2,r:15,hp:u.hp,max:u.hp,speed:u.speed,damage:u.damage,cd:0,skillCd:0,dashCd:0,inv:0,anim:0};bullets=[];foes=[];particles=[];rings=[];texts=[];kills=0;wave=1;chips=0;spawn=.2;active=true;$('overlay').style.display='none';$('hud').hidden=false;$('heroLabel').textContent=u.name+' / '+u.en;last=performance.now();requestAnimationFrame(loop);toast('战甲同步完成 · 战区已开放')}
 $('start').onclick=start;
-function stick(el,cb){let id=null,rect;const update=e=>{if(id!==null){let x=e.clientX-rect.left-rect.width/2,y=e.clientY-rect.top-rect.height/2,m=Math.hypot(x,y),max=rect.width*.34;if(m>max){x=x/m*max;y=y/m*max}cb(x/max,y/max)}};el.addEventListener('pointerdown',e=>{id=e.pointerId;rect=el.getBoundingClientRect();el.setPointerCapture(id);update(e)});el.addEventListener('pointermove',e=>{if(e.pointerId===id)update(e)});const end=e=>{if(e.pointerId===id){id=null;cb(0,0)}};el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)}
+function stick(el,cb){let id=null,rect;const upd=e=>{if(id!==null){let x=e.clientX-rect.left-rect.width/2,y=e.clientY-rect.top-rect.height/2,m=Math.hypot(x,y),max=rect.width*.34;if(m>max){x=x/m*max;y=y/m*max}cb(x/max,y/max)}};el.addEventListener('pointerdown',e=>{id=e.pointerId;rect=el.getBoundingClientRect();el.setPointerCapture(id);upd(e)});el.addEventListener('pointermove',e=>{if(e.pointerId===id)upd(e)});['pointerup','pointercancel'].forEach(v=>el.addEventListener(v,e=>{if(e.pointerId===id){id=null;cb(0,0)}}))}
 stick($('move'),(x,y)=>move={x,y});
-let firing=false;function hold(id,fn){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>fn(false)))}
-hold('fire',v=>firing=v);
-$('dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});
-$('skill').addEventListener('pointerdown',e=>{e.preventDefault();skill()});
-function dash(){if(!active||player.dashCd>0)return;let m=Math.hypot(move.x,move.y)||1;player.x+=((move.x||aim.x)/m)*105;player.y+=((move.y||aim.y)/m)*105;player.x=Math.max(20,Math.min(W-20,player.x));player.y=Math.max(20,Math.min(H-20,player.y));player.inv=.35;player.dashCd=2.2;burst(player.x,player.y,'#75eee2',14)}
-function skill(){if(!active||player.skillCd>0)return;const h=heroes[selected];player.skillCd=8;
- if(selected===5){player.hp=Math.min(player.max,player.hp+45);toast('战地急救：恢复生命')}
- else if(selected===1||selected===3){foes.forEach(f=>{if(Math.hypot(f.x-player.x,f.y-player.y)<155){f.hp-=selected===1?55:42;burst(f.x,f.y,'#e9c77b',7)}});toast(selected===1?'重锤震荡！':'电磁脉冲！')}
- else {let dx=aim.x,dy=aim.y;for(let i=0;i<3;i++)bullets.push({x:player.x,y:player.y,vx:dx*590,vy:dy*590,life:.65,damage:player.damage*1.5,r:5,pierce:selected===4?2:0});toast(selected===4?'穿透弹发射！':'影袭弹幕！')}
+function hold(id,fn){let el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointercancel','pointerleave'].forEach(v=>el.addEventListener(v,()=>fn(false)))}
+hold('fire',v=>firing=v);$('dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});$('skill').addEventListener('pointerdown',e=>{e.preventDefault();skill()});
+function burst(x,y,color,n=14,power=170){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=power*(.25+Math.random());particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.25+Math.random()*.55,max:.8,color,size:1+Math.random()*3})}}
+function ring(x,y,color,max=100){rings.push({x,y,r:5,max,life:.45,color})}
+function floatText(x,y,s,color='#ffe2a3'){texts.push({x,y,s,color,life:.8})}
+function dash(){if(!active||player.dashCd>0)return;let l=Math.hypot(move.x,move.y)||1,dx=move.x||aim.x,dy=move.y||aim.y;dx/=l;dy/=l;let ox=player.x,oy=player.y;for(let i=0;i<5;i++)particles.push({x:ox-dx*i*13,y:oy-dy*i*13,vx:-dx*25,vy:-dy*25,life:.35,max:.35,color:units[selected].color,size:15-i*2});player.x=Math.max(25,Math.min(W-25,player.x+dx*125));player.y=Math.max(25,Math.min(H-25,player.y+dy*125));player.inv=.48;player.dashCd=2.1;shake=5;ring(ox,oy,units[selected].color,70)}
+function skill(){if(!active||player.skillCd>0)return;let u=units[selected];player.skillCd=7.5;
+ if(selected===5){player.hp=Math.min(player.max,player.hp+55);ring(player.x,player.y,u.color,145);foes.forEach(f=>{if(Math.hypot(f.x-player.x,f.y-player.y)<145){f.hp-=24;floatText(f.x,f.y-20,'24',u.color)}});toast('圣光回响 · 装甲修复')}
+ else if(selected===1||selected===3){let range=selected===1?175:215;ring(player.x,player.y,u.color,range);foes.forEach(f=>{if(Math.hypot(f.x-player.x,f.y-player.y)<range){let d=selected===1?68:52;f.hp-=d;floatText(f.x,f.y-20,d,u.accent);burst(f.x,f.y,u.color,12,220)}});shake=9;toast(u.skill+' · 冲击释放')}
+ else{let a=Math.atan2(aim.y,aim.x);for(let j=-1;j<=1;j++){let ang=a+j*.15;bullets.push({x:player.x,y:player.y,vx:Math.cos(ang)*790,vy:Math.sin(ang)*790,life:.85,damage:u.damage*2.4,r:7,color:u.color,pierce:selected===4?3:1,trail:[]})}ring(player.x,player.y,u.color,85);shake=4;toast(u.skill+' · 能量过载')}
 }
-function shoot(){if(player.cd>0)return;player.cd=.19;let h=heroes[selected],spread=(Math.random()-.5)*(selected===4?.025:.09),a=Math.atan2(aim.y,aim.x)+spread;bullets.push({x:player.x+Math.cos(a)*15,y:player.y+Math.sin(a)*15,vx:Math.cos(a)*590,vy:Math.sin(a)*590,life:1.1,damage:player.damage,r:4,pierce:selected===4?1:0})}
-function burst(x,y,color,n){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=35+Math.random()*150;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.35,color})}}
-function spawnFoe(){let side=Math.floor(Math.random()*4),x=side===0?10:side===1?W-10:Math.random()*W,y=side===2?10:side===3?H-10:Math.random()*H;let tough=wave>2&&Math.random()<.22;foes.push({x,y,r:tough?17:12,hp:tough?75:38,max:tough?75:38,speed:(tough?42:58)+wave*3,damage:tough?18:11,cd:0,tough})}
-function loop(t){if(!active)return;let dt=Math.min((t-last)/1000,.033);last=t;update(dt);draw();requestAnimationFrame(loop)}
-function update(dt){
- const h=heroes[selected];let mx=move.x+(keys.KeyD?1:0)-(keys.KeyA?1:0),my=move.y+(keys.KeyS?1:0)-(keys.KeyW?1:0),len=Math.hypot(mx,my)||1;
- player.x=Math.max(16,Math.min(W-16,player.x+mx/len*player.speed*dt));player.y=Math.max(16,Math.min(H-16,player.y+my/len*player.speed*dt));
- if(mouse.down){let dx=mouse.x-player.x,dy=mouse.y-player.y,l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l};firing=true}else if(foes.length){let f=foes.reduce((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)<Math.hypot(b.x-player.x,b.y-player.y)?a:b);let dx=f.x-player.x,dy=f.y-player.y,l=Math.hypot(dx,dy)||1;if(!touchAim)aim={x:dx/l,y:dy/l}}
+function shoot(){if(player.cd>0)return;let u=units[selected];player.cd=selected===4?.24:.17;let a=Math.atan2(aim.y,aim.x)+(Math.random()-.5)*(selected===4?.012:.065);bullets.push({x:player.x+Math.cos(a)*24,y:player.y+Math.sin(a)*24,vx:Math.cos(a)*760,vy:Math.sin(a)*760,life:1.05,damage:u.damage,r:selected===4?5:4,color:u.accent,pierce:selected===4?1:0,trail:[]});particles.push({x:player.x+Math.cos(a)*25,y:player.y+Math.sin(a)*25,vx:0,vy:0,life:.09,max:.09,color:u.color,size:10})}
+function spawnFoe(){let side=Math.floor(Math.random()*4),x=side===0?5:side===1?W-5:Math.random()*W,y=side===2?5:side===3?H-5:Math.random()*H,big=wave>=2&&Math.random()<.25;foes.push({x,y,r:big?20:14,hp:big?112:48,max:big?112:48,speed:(big?43:67)+wave*3,damage:big?19:12,cd:0,big,phase:Math.random()*6,flash:0})}
+function loop(t){if(!active)return;let dt=Math.min((t-last)/1000,.032);last=t;clock+=dt;update(dt);draw();requestAnimationFrame(loop)}
+function update(dt){let u=units[selected],mx=move.x+(keys.KeyD?1:0)-(keys.KeyA?1:0),my=move.y+(keys.KeyS?1:0)-(keys.KeyW?1:0),len=Math.hypot(mx,my)||1;player.x=Math.max(20,Math.min(W-20,player.x+mx/len*player.speed*dt));player.y=Math.max(20,Math.min(H-20,player.y+my/len*player.speed*dt));player.anim+=dt;
+ if(mouse.down){let dx=mouse.x-player.x,dy=mouse.y-player.y,l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l};firing=true}else if(foes.length&&!touchAim){let f=foes.reduce((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)<Math.hypot(b.x-player.x,b.y-player.y)?a:b);let dx=f.x-player.x,dy=f.y-player.y,l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l}}
  if(firing)shoot();player.cd=Math.max(0,player.cd-dt);player.skillCd=Math.max(0,player.skillCd-dt);player.dashCd=Math.max(0,player.dashCd-dt);player.inv=Math.max(0,player.inv-dt);
- spawn-=dt;if(spawn<=0){spawnFoe();spawn=Math.max(.35,1.45-wave*.07);if(kills>=wave*8){wave++;toast('敌方增援升级：第 '+wave+' 波')}} 
- bullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let f of foes){if(f.hp>0&&Math.hypot(f.x-b.x,f.y-b.y)<f.r+b.r){f.hp-=b.damage;b.life=0;burst(b.x,b.y,'#f2d18c',3);if(b.pierce>0)b.pierce--;else break}}});
- bullets=bullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
- foes.forEach(f=>{let dx=player.x-f.x,dy=player.y-f.y,l=Math.hypot(dx,dy)||1;if(l>f.r+player.r+2){f.x+=dx/l*f.speed*dt;f.y+=dy/l*f.speed*dt}else if(f.cd<=0){if(player.inv<=0){player.hp-=f.damage;burst(player.x,player.y,'#ff7079',7)}f.cd=.85}f.cd=Math.max(0,f.cd-dt)});
- foes=foes.filter(f=>{if(f.hp<=0){kills++;chips+=f.tough?3:1;burst(f.x,f.y,'#f3c875',10);return false}return true});
- particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);
- $('hpbar').style.width=Math.max(0,player.hp/player.max*100)+'%';$('kills').textContent=kills;$('wave').textContent=wave;$('chips').textContent=chips;
- if(player.hp<=0){active=false;$('hud').hidden=true;$('overlay').style.display='grid';document.querySelector('.kicker').textContent='MISSION FAILED';document.querySelector('.title').textContent='信号中断';document.querySelector('.sub').textContent='本次战斗击倒 '+kills+' 名敌人，抵达第 '+wave+' 波。调整英雄与走位，再试一次。';$('start').textContent='重新部署'}
+ spawn-=dt;if(spawn<=0){spawnFoe();spawn=Math.max(.32,1.2-wave*.055)}if(kills>=wave*7){wave++;toast('警告：敌方装甲增援 / WAVE '+wave);spawn=.1}
+ bullets.forEach(b=>{b.trail.push({x:b.x,y:b.y});if(b.trail.length>6)b.trail.shift();b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let f of foes){if(f.hp>0&&Math.hypot(f.x-b.x,f.y-b.y)<f.r+b.r){f.hp-=b.damage;f.flash=.12;floatText(f.x,f.y-f.r,b.damage.toFixed(0),b.color);burst(b.x,b.y,b.color,5,130);if(b.pierce>0)b.pierce--;else{b.life=0;break}}}});
+ bullets=bullets.filter(b=>b.life>0&&b.x>-35&&b.x<W+35&&b.y>-35&&b.y<H+35);
+ foes.forEach(f=>{f.phase+=dt;f.flash=Math.max(0,f.flash-dt);let dx=player.x-f.x,dy=player.y-f.y,l=Math.hypot(dx,dy)||1;if(l>f.r+player.r+4){f.x+=dx/l*f.speed*dt;f.y+=dy/l*f.speed*dt}else if(f.cd<=0){if(player.inv<=0){player.hp-=f.damage;shake=7;burst(player.x,player.y,'#ff6476',12,190);floatText(player.x,player.y-28,'-'+f.damage,'#ff7180')}f.cd=.9}f.cd=Math.max(0,f.cd-dt)});
+ foes=foes.filter(f=>{if(f.hp<=0){kills++;chips+=f.big?4:1;burst(f.x,f.y,f.big?'#ffc77d':'#ff7380',22,230);ring(f.x,f.y,'#ffbd78',48);return false}return true});
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.vx*=.97;p.vy*=.97;p.life-=dt});particles=particles.filter(p=>p.life>0);rings.forEach(r=>{r.r+=(r.max-r.r)*dt*8;r.life-=dt});rings=rings.filter(r=>r.life>0);texts.forEach(a=>{a.y-=34*dt;a.life-=dt});texts=texts.filter(a=>a.life>0);
+ $('hpbar').style.width=Math.max(0,player.hp/player.max*100)+'%';$('kills').textContent=kills;$('wave').textContent=String(wave).padStart(2,'0');$('chips').textContent=chips;
+ if(player.hp<=0){active=false;$('hud').hidden=true;$('overlay').style.display='grid';$('heroName').textContent='战甲失联';$('heroRole').textContent='SIGNAL LOST';$('heroDesc').textContent='本次战斗击倒 '+kills+' 个目标，抵达第 '+wave+' 波。重新部署，升级你的战术。';$('start').textContent='重新部署战甲'}
 }
-let touchAim=false;
-function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b141c';ctx.fillRect(0,0,W,H);
- ctx.strokeStyle='#1a2b36';ctx.lineWidth=1;let grid=38;for(let x=0;x<W;x+=grid){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=grid){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
- // arena boundaries and cover
- ctx.strokeStyle='#355363';ctx.lineWidth=2;ctx.strokeRect(18,18,W-36,H-36);
- for(let i=0;i<7;i++){let x=(i*173+80)%(W-100)+35,y=(i*113+110)%(H-150)+45;ctx.fillStyle='#152631';ctx.fillRect(x,y,34,22);ctx.strokeStyle='#2a4554';ctx.strokeRect(x,y,34,22)}
- // core
- ctx.beginPath();ctx.arc(W/2,H/2,27,0,Math.PI*2);ctx.strokeStyle='#4d9d9d';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(W/2,H/2,5,0,Math.PI*2);ctx.fillStyle='#65e6df';ctx.fill();
- bullets.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle='#f4d28c';ctx.fill()});
- foes.forEach(f=>{ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fillStyle=f.tough?'#a84e55':'#d65f68';ctx.fill();ctx.strokeStyle='#ff9a9e';ctx.stroke();ctx.fillStyle='#351d25';ctx.fillRect(f.x-15,f.y-f.r-9,30,4);ctx.fillStyle='#ff858a';ctx.fillRect(f.x-15,f.y-f.r-9,30*Math.max(0,f.hp/f.max),4)});
- particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3)});ctx.globalAlpha=1;
- if(player){ctx.save();ctx.translate(player.x,player.y);ctx.rotate(Math.atan2(aim.y,aim.x));ctx.fillStyle='#65e6df';ctx.beginPath();ctx.moveTo(19,0);ctx.lineTo(-11,-10);ctx.lineTo(-7,0);ctx.lineTo(-11,10);ctx.closePath();ctx.fill();ctx.strokeStyle='#d5ffff';ctx.stroke();ctx.restore();ctx.beginPath();ctx.arc(player.x,player.y,player.r+4,0,Math.PI*2);ctx.strokeStyle=player.inv>0?'#fff':'#4a9298';ctx.lineWidth=2;ctx.stroke()}
+function drawFloor(){ctx.fillStyle='#0a1118';ctx.fillRect(0,0,W,H);let grd=ctx.createRadialGradient(W*.5,H*.48,20,W*.5,H*.48,Math.max(W,H)*.72);grd.addColorStop(0,'#1b3038');grd.addColorStop(.58,'#101e27');grd.addColorStop(1,'#070d13');ctx.fillStyle=grd;ctx.fillRect(0,0,W,H);
+ let grid=48,off=(clock*12)%grid;ctx.strokeStyle='#35505a22';ctx.lineWidth=1;for(let x=-grid;x<W+grid;x+=grid){ctx.beginPath();ctx.moveTo(x+off,0);ctx.lineTo(x+off,H);ctx.stroke()}for(let y=-grid;y<H+grid;y+=grid){ctx.beginPath();ctx.moveTo(0,y+off);ctx.lineTo(W,y+off);ctx.stroke()}
+ // distant orbital architecture
+ for(let i=0;i<9;i++){let x=(i*197+70)%(W+100)-30,y=(i*139+40)%(H+80)-30;ctx.save();ctx.translate(x,y);ctx.fillStyle='#1c3039';ctx.strokeStyle='#45616a66';ctx.lineWidth=1;ctx.fillRect(-24,-15,48,30);ctx.strokeRect(-24,-15,48,30);ctx.fillStyle='#6caaa555';ctx.fillRect(-17,-10,34,2);ctx.fillStyle='#0a141b';ctx.fillRect(-20,6,40,4);ctx.restore()}
+ // central reactor pad
+ ctx.save();ctx.translate(W/2,H/2);ctx.rotate(clock*.06);for(let i=0;i<3;i++){ctx.beginPath();ctx.ellipse(0,0,42+i*15,20+i*8,0,0,Math.PI*2);ctx.strokeStyle=i===0?'#83d9d966':'#53768133';ctx.lineWidth=2;ctx.stroke()}glow(ctx,0,0,65,'#4ec8c4',.12);ctx.restore();
+ ctx.strokeStyle='#5a899355';ctx.lineWidth=2;ctx.strokeRect(12,12,W-24,H-24);
 }
-addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space')dash();if(e.code==='KeyE')skill()});addEventListener('keyup',e=>keys[e.code]=false);
-canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.clientX;mouse.y=e.clientY;let dx=mouse.x-(player?.x||W/2),dy=mouse.y-(player?.y||H/2),l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l}}});
-canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){mouse.down=true;mouse.x=e.clientX;mouse.y=e.clientY}});addEventListener('pointerup',e=>{if(e.pointerType==='mouse'){mouse.down=false;firing=false}});
+function drawEnemy(f){ctx.save();ctx.translate(f.x,f.y);ctx.rotate(Math.atan2(player.y-f.y,player.x-f.x));let bob=Math.sin(f.phase*5)*2;ctx.translate(0,bob);glow(ctx,0,0,f.big?40:26,'#ff4f68',.25);ctx.fillStyle=f.flash>0?'#fff0e5':(f.big?'#7d3949':'#633441');ctx.strokeStyle='#e8878d';ctx.lineWidth=1.5;
+ // spider-like armored chassis
+ poly(ctx,[[-12,-11],[-4,-18],[8,-16],[15,-7],[12,10],[3,16],[-12,10],[-17,0]],ctx.fillStyle,'#160e18',2);
+ for(let s of [-1,1]){poly(ctx,[[s*9,-8],[s*18,-17],[s*25,-13],[s*17,-3]],'#a95a64','#321d28',2);poly(ctx,[[s*11,7],[s*22,14],[s*25,21],[s*16,18]],'#633441','#291923',2)}
+ poly(ctx,[[-7,-10],[0,-17],[9,-9],[7,6],[-5,9],[-11,0]],'#a85d69','#281722',1.5);poly(ctx,[[-5,-6],[6,-6],[3,1],[-4,1]],'#ffb1a5',null);glow(ctx,0,-3,10,'#ff6577',.65);
+ if(f.big){poly(ctx,[[-8,-15],[-17,-27],[-4,-22],[5,-26],[13,-16]],'#d18a77','#321b22',2)}
+ ctx.restore();ctx.fillStyle='#28151d';ctx.fillRect(f.x-18,f.y-f.r-12,36,3);ctx.fillStyle='#ff6879';ctx.fillRect(f.x-18,f.y-f.r-12,36*Math.max(0,f.hp/f.max),3)}
+function draw(){ctx.save();if(shake>0){ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.83;if(shake<.3)shake=0}drawFloor();
+ bullets.forEach(b=>{for(let i=0;i<b.trail.length;i++){let q=b.trail[i];ctx.globalAlpha=(i+1)/b.trail.length*.45;glow(ctx,q.x,q.y,7,b.color,.8)}ctx.globalAlpha=1;glow(ctx,b.x,b.y,13,b.color,.7);ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle='#fff6d8';ctx.fill()});
+ foes.forEach(drawEnemy);
+ rings.forEach(r=>{ctx.beginPath();ctx.arc(r.x,r.y,r.r,0,Math.PI*2);ctx.strokeStyle=r.color;ctx.globalAlpha=Math.max(0,r.life*1.7);ctx.lineWidth=3;ctx.stroke();ctx.globalAlpha=1;glow(ctx,r.x,r.y,r.r*.4,r.color,.08)});
+ particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life/(p.max||.8));glow(ctx,p.x,p.y,p.size*3,p.color,.35);ctx.fillStyle=p.color;ctx.fillRect(p.x-p.size/2,p.y-p.size/2,p.size,p.size)});ctx.globalAlpha=1;
+ texts.forEach(a=>{ctx.globalAlpha=Math.max(0,a.life);ctx.font='bold 12px system-ui';ctx.textAlign='center';ctx.fillStyle=a.color;ctx.shadowColor=a.color;ctx.shadowBlur=8;ctx.fillText(a.s,a.x,a.y);ctx.shadowBlur=0});ctx.globalAlpha=1;
+ if(player){let ang=Math.atan2(aim.y,aim.x);if(player.inv>0){glow(ctx,player.x,player.y,40,units[selected].color,.5);ctx.beginPath();ctx.arc(player.x,player.y,28+Math.sin(clock*35)*4,0,Math.PI*2);ctx.strokeStyle='#eaffff';ctx.lineWidth=2;ctx.stroke()}drawFrame(ctx,player.x,player.y,1.18,ang,units[selected],clock,true);ctx.beginPath();ctx.arc(player.x,player.y,23,0,Math.PI*2);ctx.strokeStyle=units[selected].color+'66';ctx.lineWidth=1;ctx.stroke()}
+ ctx.restore()}
+ addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space')dash();if(e.code==='KeyE')skill()});addEventListener('keyup',e=>keys[e.code]=false);
+ canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.clientX;mouse.y=e.clientY;let dx=mouse.x-(player?.x||W/2),dy=mouse.y-(player?.y||H/2),l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l}}});
+ canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){mouse.down=true;mouse.x=e.clientX;mouse.y=e.clientY}});addEventListener('pointerup',e=>{if(e.pointerType==='mouse'){mouse.down=false;firing=false}});
+ resize();selectUnit(0);function idle(){if(!active){clock+=.016;drawPreview();requestAnimationFrame(idle)}}requestAnimationFrame(idle);
 })();
 </script></body></html>
