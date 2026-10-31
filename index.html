@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#0b1118"><title>边界回响 · BOUNDARY ECHO</title>
+<style>
+:root{color-scheme:dark;--bg:#0b1118;--panel:#111c27;--line:#294052;--cyan:#65e6df;--gold:#f3c875;--red:#ff6e76}
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:system-ui,-apple-system,"Microsoft Yahei",sans-serif;touch-action:none;color:#e8f0f3}
+#game{position:fixed;inset:0;width:100%;height:100%;display:block}
+.hud{position:fixed;inset:0;pointer-events:none;padding:env(safe-area-inset-top) 14px env(safe-area-inset-bottom)}
+.top{display:flex;justify-content:space-between;align-items:flex-start;padding-top:10px;gap:8px}.brand{font-size:11px;letter-spacing:3px;color:var(--cyan);font-weight:800}.stats{display:flex;gap:7px}.pill{background:#101c27d9;border:1px solid #345063;border-radius:9px;padding:7px 10px;font-size:12px;backdrop-filter:blur(8px)}
+.health{width:min(210px,42vw);height:7px;background:#263744;border-radius:8px;overflow:hidden;margin-top:7px}.health i{display:block;height:100%;width:100%;background:linear-gradient(90deg,#59d9c7,#c2ed9a)}
+.bottom{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 12px);left:14px;right:14px;display:flex;justify-content:space-between;align-items:end}
+.control{pointer-events:auto;display:flex;gap:9px;align-items:end}.stick{width:112px;height:112px;border:1px solid #76909a88;background:#182a38a8;border-radius:50%;position:relative;touch-action:none}.stick:after{content:"";position:absolute;width:42px;height:42px;border-radius:50%;background:#8bb8bd77;border:1px solid #b9e7e5;left:50%;top:50%;transform:translate(-50%,-50%)}.stick span{position:absolute;inset:0;display:grid;place-items:center;font-size:9px;color:#c1d7d9;letter-spacing:1px}
+.actions{display:flex;gap:8px;align-items:end}.btn{pointer-events:auto;border:1px solid #6b8a9b;background:#142633dd;color:#eaf6f5;border-radius:50%;width:58px;height:58px;font-weight:800;font-size:11px;touch-action:none;box-shadow:0 4px 18px #0005}.btn.fire{width:72px;height:72px;background:#17444b;border-color:#65e6df;color:#9dfff3}.btn.skill{border-color:#b99a5e;color:#f3d18a}.btn:active{transform:scale(.94)}
+#overlay{position:fixed;inset:0;display:grid;place-items:center;background:linear-gradient(120deg,#08121deF,#102431d9);padding:20px;z-index:5}
+.card{width:min(560px,100%);max-height:90dvh;overflow:auto;background:#101d28f2;border:1px solid #365263;border-radius:18px;padding:22px;box-shadow:0 25px 90px #0009}
+.kicker{font-size:10px;letter-spacing:4px;color:var(--cyan);font-weight:800}.title{font-size:clamp(30px,7vw,48px);line-height:1.05;margin:8px 0}.sub{color:#9fb4bf;font-size:13px;line-height:1.7}.heroes{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.hero{border:1px solid #304958;border-radius:12px;padding:11px;background:#152531;min-height:84px;text-align:left;color:#e8f0f3}.hero.active{border-color:var(--cyan);background:#17363b}.hero b{display:block;font-size:13px}.hero small{color:#9bb0bb;font-size:10px}.primary{border:0;border-radius:10px;background:var(--cyan);color:#092027;font-weight:900;padding:14px 20px;width:100%;font-size:15px}.hint{font-size:11px;color:#91a6b0;margin-top:12px;line-height:1.7}
+#toast{position:fixed;top:22%;left:50%;transform:translateX(-50%);background:#132a34eF;border:1px solid #5a8990;border-radius:9px;padding:9px 14px;font-size:12px;opacity:0;transition:opacity .2s;pointer-events:none}
+@media(min-width:760px){.stick{width:130px;height:130px}.btn{width:64px;height:64px}.btn.fire{width:82px;height:82px}.card{padding:28px}}
+@media(max-height:520px){.stick{width:82px;height:82px}.stick:after{width:34px;height:34px}.btn{width:48px;height:48px}.btn.fire{width:60px;height:60px}.bottom{bottom:7px}.card{max-height:94dvh;padding:14px}.heroes{margin:10px 0}.hero{min-height:62px;padding:7px}}
+</style></head>
+<body>
+<canvas id="game"></canvas>
+<div class="hud" id="hud" hidden>
+ <div class="top"><div><div class="brand">BOUNDARY ECHO / 边界回响</div><div class="health"><i id="hpbar"></i></div><div style="font-size:10px;color:#a9bdc4;margin-top:4px" id="heroLabel">夜枭 · 突击型</div></div><div class="stats"><div class="pill">击倒 <b id="kills">0</b></div><div class="pill">波次 <b id="wave">1</b></div><div class="pill">芯片 <b id="chips">0</b></div></div></div>
+ <div class="bottom"><div class="control"><div class="stick" id="move"><span>MOVE</span></div></div><div class="actions"><button class="btn skill" id="dash">闪避</button><button class="btn skill" id="skill">技能</button><button class="btn fire" id="fire">射击</button></div></div>
+</div>
+<div id="toast"></div>
+<div id="overlay"><div class="card">
+<div class="kicker">TACTICAL ARENA · MOBILE PROTOTYPE</div><div class="title">边界回响</div><div class="sub">在失控边境争夺能源核心。选择你的作战单位，在不断增强的敌方攻势中生存下来。先练好走位，再找准输出窗口。</div>
+<div style="margin-top:18px;font-size:12px;color:#d6e7e9">选择作战单位</div><div class="heroes" id="heroes"></div>
+<button class="primary" id="start">进入战区</button>
+<div class="hint">操作：左侧摇杆移动 · 右侧按钮射击 / 技能 / 闪避。电脑可用 WASD 移动、鼠标瞄准、左键射击、空格闪避、E 释放技能。当前版本为本地人机试玩，在线房间正在后续开发。</div>
+</div></div>
+<script>
+(()=>{
+const canvas=document.getElementById('game'),ctx=canvas.getContext('2d');
+let W=0,H=0,dpr=1,active=false,last=0,player,bullets=[],foes=[],particles=[],kills=0,wave=1,chips=0,spawn=0,selected=0,aim={x:1,y:0},move={x:0,y:0},keys={},mouse={x:0,y:0,down:false};
+const heroes=[
+{name:'夜枭',role:'突击刺客',desc:'高爆发 · 短位移',hp:100,speed:220,damage:25,skill:'影袭'},
+{name:'重锤',role:'重装前线',desc:'高生命 · 范围震荡',hp:155,speed:165,damage:19,skill:'震荡波'},
+{name:'幻影',role:'游击渗透',desc:'高机动 · 连续突袭',hp:95,speed:245,damage:17,skill:'相位步'},
+{name:'磁暴',role:'范围压制',desc:'持续伤害 · 链式电弧',hp:110,speed:185,damage:15,skill:'电磁脉冲'},
+{name:'猎隼',role:'远程火力',desc:'远距离 · 稳定输出',hp:105,speed:180,damage:22,skill:'穿透弹'},
+{name:'医官',role:'支援控制',desc:'恢复 · 战场续航',hp:125,speed:175,damage:16,skill:'战地急救'}
+];
+const $=id=>document.getElementById(id);
+heroes.forEach((h,i)=>{let b=document.createElement('button');b.className='hero'+(i===0?' active':'');b.innerHTML='<b>'+h.name+'</b><small>'+h.role+'<br>'+h.desc+'</small>';b.onclick=()=>{selected=i;document.querySelectorAll('.hero').forEach((x,j)=>x.classList.toggle('active',j===i))};$('heroes').appendChild(b)});
+function resize(){dpr=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;canvas.width=W*dpr;canvas.height=H*dpr;canvas.style.width=W+'px';canvas.style.height=H+'px';ctx.setTransform(dpr,0,0,dpr,0,0)}
+addEventListener('resize',resize);resize();
+function toast(s){$('toast').textContent=s;$('toast').style.opacity=1;clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').style.opacity=0,1300)}
+function start(){const h=heroes[selected];player={x:W/2,y:H/2,r:13,hp:h.hp,max:h.hp,speed:h.speed,damage:h.damage,cd:0,skillCd:0,dashCd:0,inv:0};bullets=[];foes=[];particles=[];kills=0;wave=1;chips=0;spawn=0;active=true;$('overlay').style.display='none';$('hud').hidden=false;$('heroLabel').textContent=h.name+' · '+h.role;last=performance.now();requestAnimationFrame(loop);toast('任务开始：守住能源核心')}
+$('start').onclick=start;
+function stick(el,cb){let id=null,rect;const update=e=>{if(id!==null){let x=e.clientX-rect.left-rect.width/2,y=e.clientY-rect.top-rect.height/2,m=Math.hypot(x,y),max=rect.width*.34;if(m>max){x=x/m*max;y=y/m*max}cb(x/max,y/max)}};el.addEventListener('pointerdown',e=>{id=e.pointerId;rect=el.getBoundingClientRect();el.setPointerCapture(id);update(e)});el.addEventListener('pointermove',e=>{if(e.pointerId===id)update(e)});const end=e=>{if(e.pointerId===id){id=null;cb(0,0)}};el.addEventListener('pointerup',end);el.addEventListener('pointercancel',end)}
+stick($('move'),(x,y)=>move={x,y});
+let firing=false;function hold(id,fn){const el=$(id);el.addEventListener('pointerdown',e=>{e.preventDefault();fn(true)});['pointerup','pointercancel','pointerleave'].forEach(ev=>el.addEventListener(ev,()=>fn(false)))}
+hold('fire',v=>firing=v);
+$('dash').addEventListener('pointerdown',e=>{e.preventDefault();dash()});
+$('skill').addEventListener('pointerdown',e=>{e.preventDefault();skill()});
+function dash(){if(!active||player.dashCd>0)return;let m=Math.hypot(move.x,move.y)||1;player.x+=((move.x||aim.x)/m)*105;player.y+=((move.y||aim.y)/m)*105;player.x=Math.max(20,Math.min(W-20,player.x));player.y=Math.max(20,Math.min(H-20,player.y));player.inv=.35;player.dashCd=2.2;burst(player.x,player.y,'#75eee2',14)}
+function skill(){if(!active||player.skillCd>0)return;const h=heroes[selected];player.skillCd=8;
+ if(selected===5){player.hp=Math.min(player.max,player.hp+45);toast('战地急救：恢复生命')}
+ else if(selected===1||selected===3){foes.forEach(f=>{if(Math.hypot(f.x-player.x,f.y-player.y)<155){f.hp-=selected===1?55:42;burst(f.x,f.y,'#e9c77b',7)}});toast(selected===1?'重锤震荡！':'电磁脉冲！')}
+ else {let dx=aim.x,dy=aim.y;for(let i=0;i<3;i++)bullets.push({x:player.x,y:player.y,vx:dx*590,vy:dy*590,life:.65,damage:player.damage*1.5,r:5,pierce:selected===4?2:0});toast(selected===4?'穿透弹发射！':'影袭弹幕！')}
+}
+function shoot(){if(player.cd>0)return;player.cd=.19;let h=heroes[selected],spread=(Math.random()-.5)*(selected===4?.025:.09),a=Math.atan2(aim.y,aim.x)+spread;bullets.push({x:player.x+Math.cos(a)*15,y:player.y+Math.sin(a)*15,vx:Math.cos(a)*590,vy:Math.sin(a)*590,life:1.1,damage:player.damage,r:4,pierce:selected===4?1:0})}
+function burst(x,y,color,n){for(let i=0;i<n;i++){let a=Math.random()*Math.PI*2,s=35+Math.random()*150;particles.push({x,y,vx:Math.cos(a)*s,vy:Math.sin(a)*s,life:.35+Math.random()*.35,color})}}
+function spawnFoe(){let side=Math.floor(Math.random()*4),x=side===0?10:side===1?W-10:Math.random()*W,y=side===2?10:side===3?H-10:Math.random()*H;let tough=wave>2&&Math.random()<.22;foes.push({x,y,r:tough?17:12,hp:tough?75:38,max:tough?75:38,speed:(tough?42:58)+wave*3,damage:tough?18:11,cd:0,tough})}
+function loop(t){if(!active)return;let dt=Math.min((t-last)/1000,.033);last=t;update(dt);draw();requestAnimationFrame(loop)}
+function update(dt){
+ const h=heroes[selected];let mx=move.x+(keys.KeyD?1:0)-(keys.KeyA?1:0),my=move.y+(keys.KeyS?1:0)-(keys.KeyW?1:0),len=Math.hypot(mx,my)||1;
+ player.x=Math.max(16,Math.min(W-16,player.x+mx/len*player.speed*dt));player.y=Math.max(16,Math.min(H-16,player.y+my/len*player.speed*dt));
+ if(mouse.down){let dx=mouse.x-player.x,dy=mouse.y-player.y,l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l};firing=true}else if(foes.length){let f=foes.reduce((a,b)=>Math.hypot(a.x-player.x,a.y-player.y)<Math.hypot(b.x-player.x,b.y-player.y)?a:b);let dx=f.x-player.x,dy=f.y-player.y,l=Math.hypot(dx,dy)||1;if(!touchAim)aim={x:dx/l,y:dy/l}}
+ if(firing)shoot();player.cd=Math.max(0,player.cd-dt);player.skillCd=Math.max(0,player.skillCd-dt);player.dashCd=Math.max(0,player.dashCd-dt);player.inv=Math.max(0,player.inv-dt);
+ spawn-=dt;if(spawn<=0){spawnFoe();spawn=Math.max(.35,1.45-wave*.07);if(kills>=wave*8){wave++;toast('敌方增援升级：第 '+wave+' 波')}} 
+ bullets.forEach(b=>{b.x+=b.vx*dt;b.y+=b.vy*dt;b.life-=dt;for(let f of foes){if(f.hp>0&&Math.hypot(f.x-b.x,f.y-b.y)<f.r+b.r){f.hp-=b.damage;b.life=0;burst(b.x,b.y,'#f2d18c',3);if(b.pierce>0)b.pierce--;else break}}});
+ bullets=bullets.filter(b=>b.life>0&&b.x>-20&&b.x<W+20&&b.y>-20&&b.y<H+20);
+ foes.forEach(f=>{let dx=player.x-f.x,dy=player.y-f.y,l=Math.hypot(dx,dy)||1;if(l>f.r+player.r+2){f.x+=dx/l*f.speed*dt;f.y+=dy/l*f.speed*dt}else if(f.cd<=0){if(player.inv<=0){player.hp-=f.damage;burst(player.x,player.y,'#ff7079',7)}f.cd=.85}f.cd=Math.max(0,f.cd-dt)});
+ foes=foes.filter(f=>{if(f.hp<=0){kills++;chips+=f.tough?3:1;burst(f.x,f.y,'#f3c875',10);return false}return true});
+ particles.forEach(p=>{p.x+=p.vx*dt;p.y+=p.vy*dt;p.life-=dt});particles=particles.filter(p=>p.life>0);
+ $('hpbar').style.width=Math.max(0,player.hp/player.max*100)+'%';$('kills').textContent=kills;$('wave').textContent=wave;$('chips').textContent=chips;
+ if(player.hp<=0){active=false;$('hud').hidden=true;$('overlay').style.display='grid';document.querySelector('.kicker').textContent='MISSION FAILED';document.querySelector('.title').textContent='信号中断';document.querySelector('.sub').textContent='本次战斗击倒 '+kills+' 名敌人，抵达第 '+wave+' 波。调整英雄与走位，再试一次。';$('start').textContent='重新部署'}
+}
+let touchAim=false;
+function draw(){ctx.clearRect(0,0,W,H);ctx.fillStyle='#0b141c';ctx.fillRect(0,0,W,H);
+ ctx.strokeStyle='#1a2b36';ctx.lineWidth=1;let grid=38;for(let x=0;x<W;x+=grid){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=0;y<H;y+=grid){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}
+ // arena boundaries and cover
+ ctx.strokeStyle='#355363';ctx.lineWidth=2;ctx.strokeRect(18,18,W-36,H-36);
+ for(let i=0;i<7;i++){let x=(i*173+80)%(W-100)+35,y=(i*113+110)%(H-150)+45;ctx.fillStyle='#152631';ctx.fillRect(x,y,34,22);ctx.strokeStyle='#2a4554';ctx.strokeRect(x,y,34,22)}
+ // core
+ ctx.beginPath();ctx.arc(W/2,H/2,27,0,Math.PI*2);ctx.strokeStyle='#4d9d9d';ctx.lineWidth=2;ctx.stroke();ctx.beginPath();ctx.arc(W/2,H/2,5,0,Math.PI*2);ctx.fillStyle='#65e6df';ctx.fill();
+ bullets.forEach(b=>{ctx.beginPath();ctx.arc(b.x,b.y,b.r,0,Math.PI*2);ctx.fillStyle='#f4d28c';ctx.fill()});
+ foes.forEach(f=>{ctx.beginPath();ctx.arc(f.x,f.y,f.r,0,Math.PI*2);ctx.fillStyle=f.tough?'#a84e55':'#d65f68';ctx.fill();ctx.strokeStyle='#ff9a9e';ctx.stroke();ctx.fillStyle='#351d25';ctx.fillRect(f.x-15,f.y-f.r-9,30,4);ctx.fillStyle='#ff858a';ctx.fillRect(f.x-15,f.y-f.r-9,30*Math.max(0,f.hp/f.max),4)});
+ particles.forEach(p=>{ctx.globalAlpha=Math.max(0,p.life*2);ctx.fillStyle=p.color;ctx.fillRect(p.x,p.y,3,3)});ctx.globalAlpha=1;
+ if(player){ctx.save();ctx.translate(player.x,player.y);ctx.rotate(Math.atan2(aim.y,aim.x));ctx.fillStyle='#65e6df';ctx.beginPath();ctx.moveTo(19,0);ctx.lineTo(-11,-10);ctx.lineTo(-7,0);ctx.lineTo(-11,10);ctx.closePath();ctx.fill();ctx.strokeStyle='#d5ffff';ctx.stroke();ctx.restore();ctx.beginPath();ctx.arc(player.x,player.y,player.r+4,0,Math.PI*2);ctx.strokeStyle=player.inv>0?'#fff':'#4a9298';ctx.lineWidth=2;ctx.stroke()}
+}
+addEventListener('keydown',e=>{keys[e.code]=true;if(e.code==='Space')dash();if(e.code==='KeyE')skill()});addEventListener('keyup',e=>keys[e.code]=false);
+canvas.addEventListener('pointermove',e=>{if(e.pointerType==='mouse'){mouse.x=e.clientX;mouse.y=e.clientY;let dx=mouse.x-(player?.x||W/2),dy=mouse.y-(player?.y||H/2),l=Math.hypot(dx,dy)||1;aim={x:dx/l,y:dy/l}}});
+canvas.addEventListener('pointerdown',e=>{if(e.pointerType==='mouse'){mouse.down=true;mouse.x=e.clientX;mouse.y=e.clientY}});addEventListener('pointerup',e=>{if(e.pointerType==='mouse'){mouse.down=false;firing=false}});
+})();
+</script></body></html>
