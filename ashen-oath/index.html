@@ -1,221 +1,54 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<meta name="theme-color" content="#090b0e"><meta name="description" content="ASHEN OATH 灰烬誓约：一款为手机和折叠屏设计的暗黑动作网页游戏。">
-<title>ASHEN OATH · 灰烬誓约</title>
+<!doctype html><html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover"><meta name="theme-color" content="#090b0e"><title>ASHEN OATH · 灰烬誓约</title>
 <style>
-:root{color-scheme:dark;--gold:#c9a66b;--red:#a43c32;--ink:#090b0e;--muted:#9b9a95}
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#080a0d;color:#eee;font-family:system-ui,"Noto Sans SC",sans-serif;touch-action:none}
-#game{position:relative;width:100%;height:100%;min-height:320px;background:radial-gradient(ellipse at 50% 42%,#283038 0%,#11161c 48%,#080a0d 100%);overflow:hidden}
-canvas{display:block;width:100%;height:100%;touch-action:none}
-.hud{position:absolute;inset:0;pointer-events:none;padding:calc(env(safe-area-inset-top) + 12px) calc(env(safe-area-inset-right) + 14px) calc(env(safe-area-inset-bottom) + 12px) calc(env(safe-area-inset-left) + 14px)}
-.top{display:flex;justify-content:space-between;align-items:flex-start;gap:12px}
-.brand{font-family:Georgia,serif;letter-spacing:.22em;font-size:clamp(13px,2vw,20px);color:#e0c99d;text-shadow:0 2px 12px #000}
-.sub{font-size:10px;letter-spacing:.24em;color:#8c8d8b;margin-top:4px}
-.stats{width:min(34vw,260px);min-width:140px;background:#080b0ed9;border:1px solid #9c866044;padding:9px 11px;backdrop-filter:blur(8px)}
-.row{display:flex;justify-content:space-between;font-size:10px;color:#c9c5bb;margin:0 0 4px}
-.bar{height:7px;background:#292b2c;margin-bottom:7px;overflow:hidden;border:1px solid #ffffff12}
-.fill{height:100%;width:100%;transition:width .12s linear}
-#hp{background:linear-gradient(90deg,#762c28,#d36b55)}#st{background:linear-gradient(90deg,#85703c,#d4b66f)}#boss{background:linear-gradient(90deg,#762c28,#d66b58)}
-.bossbox{position:absolute;top:calc(env(safe-area-inset-top) + 16px);left:50%;transform:translateX(-50%);width:min(42vw,420px);text-align:center;display:none}
-.bossname{font:12px Georgia,serif;letter-spacing:.28em;color:#e2c99c;margin-bottom:5px}
-.bossbar{height:8px;background:#211a1a;border:1px solid #9c6c5b88}
-.stage{position:absolute;top:22%;left:50%;transform:translate(-50%,-50%);text-align:center;color:#dfc89d;text-shadow:0 3px 14px #000;letter-spacing:.25em;font:clamp(12px,2vw,18px) Georgia,serif;opacity:0;transition:opacity .6s}
-.message{position:absolute;top:31%;left:50%;transform:translateX(-50%);font-size:clamp(12px,1.8vw,16px);letter-spacing:.12em;color:#f0d9ac;text-shadow:0 2px 8px #000;text-align:center;white-space:nowrap;opacity:0;transition:opacity .2s}
-.controls{position:absolute;inset:0;pointer-events:none}
-.pad{position:absolute;bottom:calc(env(safe-area-inset-bottom) + 22px);left:calc(env(safe-area-inset-left) + 20px);width:clamp(118px,19vw,170px);height:clamp(118px,19vw,170px);border:1px solid #d0c4a044;border-radius:50%;background:#c4b99b0d;pointer-events:auto;touch-action:none}
-.pad:before{content:"";position:absolute;inset:25%;border:1px solid #d0c4a022;border-radius:50%}
-.knob{position:absolute;width:39%;height:39%;left:30.5%;top:30.5%;border-radius:50%;background:radial-gradient(circle at 35% 30%,#b5a17b99,#544c4077);border:1px solid #d9c69a88;box-shadow:0 3px 15px #0009;pointer-events:none}
-.actions{position:absolute;right:calc(env(safe-area-inset-right) + 18px);bottom:calc(env(safe-area-inset-bottom) + 20px);width:clamp(190px,30vw,290px);height:clamp(155px,25vw,220px);pointer-events:none}
-.btn{position:absolute;border:1px solid #c6b18488;border-radius:50%;background:radial-gradient(circle at 35% 25%,#4a4840e8,#171a1deF);color:#e8d7b4;font-weight:650;letter-spacing:.08em;box-shadow:0 5px 15px #0009,inset 0 0 15px #d2b77812;pointer-events:auto;touch-action:none;user-select:none;width:clamp(48px,8vw,68px);height:clamp(48px,8vw,68px);font-size:clamp(10px,1.4vw,13px)}
-.btn:active,.btn.down{background:radial-gradient(circle,#927348,#29221b);transform:scale(.94)}
-#attack{right:0;bottom:28px;width:clamp(66px,10vw,88px);height:clamp(66px,10vw,88px);border-color:#cfa66a}
-#heavy{right:28%;bottom:0}#dodge{right:47%;bottom:62px}#block{right:4%;bottom:124px}#lock{right:43%;bottom:130px}
-.overlay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:linear-gradient(120deg,#07090deF,#0b1016df);z-index:5;padding:22px}
-.card{width:min(580px,94vw);border:1px solid #9d80564f;background:linear-gradient(145deg,#1a2026ed,#0b0e12f5);padding:clamp(22px,5vw,48px);box-shadow:0 25px 90px #000b;position:relative}
-.card:before{content:"";position:absolute;inset:8px;border:1px solid #c2a16c20;pointer-events:none}
-.eyebrow{color:#b99965;font:11px Georgia,serif;letter-spacing:.38em}
-h1{font:clamp(34px,8vw,64px) Georgia,serif;letter-spacing:.12em;font-weight:400;margin:14px 0 4px;color:#e3d4b6}
-.cn{letter-spacing:.5em;color:#b7a88b;font-size:13px}
-.desc{color:#a8a8a4;line-height:1.8;font-size:13px;margin:22px 0}
-.primary{border:1px solid #b99a66;background:linear-gradient(90deg,#6e5030,#9a7547);color:#fff1d2;padding:14px 28px;letter-spacing:.2em;font-size:13px;min-width:170px}
-.primary:active{filter:brightness(1.2)}
-.hint{font-size:11px;color:#777d80;line-height:1.7;margin-top:18px}
-.hidden{display:none!important}
-#toast{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);font:clamp(15px,2.4vw,22px) Georgia,serif;letter-spacing:.22em;color:#e5c990;text-shadow:0 3px 15px #000;opacity:0;pointer-events:none;transition:opacity .25s}
-@media(max-width:650px){.stats{min-width:132px;width:40vw}.bossbox{top:104px;width:56vw}.brand{font-size:12px}.sub{font-size:8px}.pad{width:124px;height:124px;left:14px;bottom:18px}.actions{right:10px;bottom:12px;width:190px;height:166px}#attack{width:68px;height:68px;right:0;bottom:25px}#block{right:0;bottom:112px}#heavy{right:31%;bottom:0}#dodge{right:48%;bottom:58px}#lock{right:48%;bottom:122px}.btn{width:49px;height:49px;font-size:10px}}
-@media(orientation:portrait) and (max-width:700px){.rotate{display:block!important}}
-.rotate{display:none;position:absolute;inset:0;background:#080a0d;z-index:8;align-items:center;justify-content:center;text-align:center;color:#d7c29b;letter-spacing:.15em;padding:30px}
-</style></head>
-<body><main id="game">
-<canvas id="c" aria-label="ASHEN OATH 游戏画面"></canvas>
-<div class="hud">
- <div class="top"><div><div class="brand">ASHEN OATH</div><div class="sub">灰 烬 誓 约 · THE LAST PILGRIMAGE</div></div>
- <div class="stats"><div class="row"><span>生命 VITALITY</span><span id="hpv">100 / 100</span></div><div class="bar"><div class="fill" id="hp"></div></div><div class="row"><span>精力 STAMINA</span><span id="stv">100 / 100</span></div><div class="bar"><div class="fill" id="st"></div></div></div></div>
- <div class="bossbox" id="bossbox"><div class="bossname" id="bossname">灰烬守卫</div><div class="bossbar"><div class="fill" id="boss"></div></div></div>
- <div class="stage" id="stage"></div><div class="message" id="message"></div>
-</div>
-<div class="controls" id="controls">
- <div class="pad" id="pad"><div class="knob" id="knob"></div></div>
- <div class="actions">
-  <button class="btn" id="lock">锁定</button><button class="btn" id="block">格挡</button><button class="btn" id="dodge">闪避</button><button class="btn" id="heavy">重击</button><button class="btn" id="attack">斩击</button>
- </div>
-</div>
-<div id="toast"></div>
-<div class="overlay" id="menu"><div class="card"><div class="eyebrow">A DARK ACTION JOURNEY</div><h1>ASHEN OATH</h1><div class="cn">灰 烬 誓 约</div><p class="desc">王国沉入灰烬之后，誓言仍在盔甲深处燃烧。穿过三片失落之地，击败守门者，走向王座深渊。<br><br>观察敌人的起手，抓住弹反时机。贪刀会死，犹豫也会死。</p><button class="primary" id="start">开始远征</button><div class="hint">横屏体验 · 手机左侧摇杆移动，右侧按钮战斗。<br>键盘：WASD 移动 / J 轻击 / L 重击 / K 格挡 / Space 闪避 / Tab 锁定。<br>原创网页动作游戏 · 自动保存战役进度</div></div></div>
-<div class="overlay hidden" id="end"><div class="card"><div class="eyebrow" id="endtag">THE OATH REMAINS</div><h1 id="endtitle">战役完成</h1><p class="desc" id="enddesc"></p><button class="primary" id="again">再次远征</button></div></div>
-<div class="rotate">请将 Galaxy Z Fold7 横向展开<br><br>旋转屏幕以获得完整战斗视野</div>
-</main>
-<script>
-(()=>{
-"use strict";
-const $=id=>document.getElementById(id), canvas=$("c"),ctx=canvas.getContext("2d");
-let W=0,H=0,DPR=1, last=0, running=false, started=false, paused=false, time=0, stage=0, kills=0, lockOn=true, shake=0, toastTimer=0, messageTimer=0, combo=0, comboTimer=0;
-const stages=[
- {name:"I · 灰烬庭院",boss:"断誓守卫 · VARG",hp:360,speed:1.12,damage:16,kind:0,desc:"庭院的守门者已倒下。前方的回廊仍在燃烧。"},
- {name:"II · 断裂回廊",boss:"赤痕审判官 · MORD",hp:490,speed:1.25,damage:19,kind:1,desc:"审判官的火焰熄灭了。王座深渊的大门已经开启。"},
- {name:"III · 王座深渊",boss:"灰烬君王 · ODRAN",hp:680,speed:1.38,damage:23,kind:2,desc:"最后一位君王倒下。灰烬终于归于寂静。"}
-];
-const player={x:0,y:1.5,vx:0,vy:0,r:17,hp:100,maxHp:100,st:100,maxSt:100,face:0,attack:0,attackKind:0,attackHit:false,dodge:0,invuln:0,block:false,parry:0,stun:0,flash:0};
-let enemy={x:0,y:0,hp:360,maxHp:360,phase:"idle",timer:1.4,attack:0,flash:0,dead:false,pattern:0,angle:0};
-const input={x:0,y:0,keys:{},touches:new Map(),block:false};
-const clamp=(v,a,b)=>Math.max(a,Math.min(b,v)), dist=(a,b)=>Math.hypot(a.x-b.x,a.y-b.y);
-function resize(){DPR=Math.min(devicePixelRatio||1,1.8);W=canvas.clientWidth;H=canvas.clientHeight;canvas.width=Math.floor(W*DPR);canvas.height=Math.floor(H*DPR);ctx.setTransform(DPR,0,0,DPR,0,0)}
-addEventListener("resize",resize);resize();
-function toast(s){$("toast").textContent=s;$("toast").style.opacity=1;toastTimer=1.2}
-function stageTitle(){const el=$("stage");el.textContent=stages[stage].name;el.style.opacity=1;setTimeout(()=>el.style.opacity=0,2400)}
-function say(s){$("message").textContent=s;$("message").style.opacity=1;messageTimer=1.3}
-function resetEnemy(){let d=stages[stage];enemy={x:W*.5,y:H*.34,hp:d.hp,maxHp:d.hp,phase:"idle",timer:1.25,attack:0,flash:0,dead:false,pattern:0,angle:0};$("bossname").textContent=d.boss;$("bossbox").style.display="block"}
-function start(){stage=0;kills=0;player.hp=100;player.st=100;player.x=W*.5;player.y=H*.72;player.invuln=0;player.stun=0;combo=0;resetEnemy();$("menu").classList.add("hidden");$("end").classList.add("hidden");$("controls").style.display="block";started=true;running=true;stageTitle();last=performance.now();requestAnimationFrame(loop)}
-$("start").addEventListener("click",start);$("again").addEventListener("click",start);
-function world(){let g=ctx.createRadialGradient(W*.5,H*.42,20,W*.5,H*.48,Math.max(W,H)*.78);g.addColorStop(0,"#31383a");g.addColorStop(.52,"#171e22");g.addColorStop(1,"#080a0d");ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
- // stone platform
- ctx.save();ctx.translate(W*.5,H*.49);ctx.scale(1,.54);let rad=Math.min(W*.49,H*.78);ctx.fillStyle="#171a1b";ctx.beginPath();ctx.arc(0,0,rad,0,Math.PI*2);ctx.fill();ctx.strokeStyle="#8a7960";ctx.globalAlpha=.24;ctx.lineWidth=3;ctx.stroke();ctx.globalAlpha=.13;
- for(let i=0;i<18;i++){let a=i*Math.PI/9;ctx.beginPath();ctx.moveTo(Math.cos(a)*rad*.18,Math.sin(a)*rad*.18);ctx.lineTo(Math.cos(a)*rad,Math.sin(a)*rad);ctx.stroke()}
- for(let r=.28;r<.96;r+=.17){ctx.beginPath();ctx.ellipse(0,0,rad*r,rad*r,0,0,Math.PI*2);ctx.stroke()}
- ctx.restore();
- // distant broken pillars and embers
- for(let i=0;i<13;i++){let x=(i*137+53)%W,y=H*.2+(i*47)%(H*.36);ctx.fillStyle=i%3?"#111719":"#272727";ctx.fillRect(x,y,8+(i%4)*4,24+(i%5)*9);ctx.fillStyle="#c17a43";ctx.globalAlpha=.2+Math.sin(time*2+i)*.08;ctx.fillRect(x+3,y+10,2,5);ctx.globalAlpha=1}
- for(let i=0;i<38;i++){let x=(i*97+Math.sin(time*.4+i)*16)%W,y=(i*61-time*(7+i%5)+H*2)%(H*.9);ctx.fillStyle=i%3?"#a66b43":"#d1a36a";ctx.globalAlpha=.16+((i%5)/10);ctx.fillRect(x,y,1.5,1.5)}ctx.globalAlpha=1;
+*{box-sizing:border-box}html,body,#game{margin:0;width:100%;height:100%;overflow:hidden;background:#080a0d;color:#eee;font-family:system-ui,"Noto Sans SC",sans-serif;touch-action:none}#view,canvas{position:absolute;inset:0;width:100%;height:100%}.hud{position:absolute;inset:0;padding:calc(env(safe-area-inset-top) + 12px) 14px 12px;pointer-events:none}.top{display:flex;justify-content:space-between}.brand{font:20px Georgia;color:#e0c99d;letter-spacing:.22em}.sub{font-size:10px;letter-spacing:.2em;color:#999}.stats{width:220px;background:#080b0ed9;border:1px solid #9c866044;padding:8px}.row{display:flex;justify-content:space-between;font-size:10px;color:#ccc;margin:0 0 4px}.bar{height:7px;background:#292b2c;margin-bottom:7px}.fill{height:100%;width:100%}#hp{background:#b84b40}#st{background:#c49b51}#boss{background:#c04c3d}.bossbox{display:none;position:absolute;top:72px;left:30%;width:40%;text-align:center}.bossname{font:12px Georgia;color:#e2c99c;letter-spacing:.2em;margin-bottom:5px}.bossbar{height:8px;background:#211a1a;border:1px solid #9c6c5b}.stage{position:absolute;top:22%;left:50%;transform:translateX(-50%);color:#dfc89d;letter-spacing:.2em;opacity:0}.message{position:absolute;top:30%;left:50%;transform:translateX(-50%);white-space:nowrap;color:#f0d9ac;opacity:0;text-shadow:0 2px 8px #000}.controls{position:absolute;inset:0;pointer-events:none}.pad{position:absolute;bottom:24px;left:20px;width:130px;height:130px;border:1px solid #d0c4a055;border-radius:50%;background:#c4b99b0d;pointer-events:auto}.knob{position:absolute;left:30%;top:30%;width:40%;height:40%;border-radius:50%;background:#8d795477;border:1px solid #d9c69a88}.actions{position:absolute;right:14px;bottom:18px;width:200px;height:180px;pointer-events:none}.btn{position:absolute;width:52px;height:52px;border-radius:50%;border:1px solid #c6b18488;background:#211f1b;color:#e8d7b4;pointer-events:auto;touch-action:none;font-size:11px}#attack{right:0;bottom:25px;width:72px;height:72px}#heavy{right:31%;bottom:0}#dodge{right:49%;bottom:60px}#block{right:0;bottom:116px}#lock{right:48%;bottom:125px}.btn.down{background:#8a673e}.overlay{position:absolute;inset:0;z-index:5;display:flex;align-items:center;justify-content:center;padding:22px;background:#080b0de8}.card{width:min(580px,94vw);padding:34px;border:1px solid #9d805655;background:linear-gradient(145deg,#1a2026,#0b0e12);box-shadow:0 25px 90px #000}.eyebrow{color:#b99965;font:11px Georgia;letter-spacing:.3em}h1{font:clamp(34px,8vw,64px) Georgia;font-weight:400;letter-spacing:.12em;color:#e3d4b6;margin:14px 0}.cn{color:#b7a88b;letter-spacing:.5em}.desc{color:#aaa;line-height:1.8;font-size:13px;margin:22px 0}.primary{border:1px solid #b99a66;background:linear-gradient(90deg,#6e5030,#9a7547);color:#fff1d2;padding:14px 28px;letter-spacing:.2em}.hint{font-size:11px;color:#888;line-height:1.8;margin-top:18px}.hidden{display:none!important}#toast{position:absolute;top:43%;left:50%;transform:translate(-50%,-50%);color:#e5c990;letter-spacing:.2em;opacity:0;text-shadow:0 3px 15px #000}.rotate{display:none}@media(orientation:portrait) and (max-width:700px){.rotate{display:flex;position:absolute;inset:0;z-index:8;background:#080a0d;align-items:center;justify-content:center;text-align:center;color:#d7c29b}.stats{width:40vw}.brand{font-size:13px}.pad{width:120px;height:120px;left:12px;bottom:16px}.actions{right:8px;bottom:8px;width:190px}.btn{width:48px;height:48px}#attack{width:66px;height:66px}}
+</style></head><body><main id="game"><div id="view"></div><div class="hud"><div class="top"><div><div class="brand">ASHEN OATH</div><div class="sub">灰 烬 誓 约 · THE LAST PILGRIMAGE</div></div><div class="stats"><div class="row"><span>生命 VITALITY</span><span id="hpv">100 / 100</span></div><div class="bar"><div class="fill" id="hp"></div></div><div class="row"><span>精力 STAMINA</span><span id="stv">100 / 100</span></div><div class="bar"><div class="fill" id="st"></div></div></div></div><div class="bossbox" id="bossbox"><div class="bossname" id="bossname"></div><div class="bossbar"><div class="fill" id="boss"></div></div></div><div class="stage" id="stage"></div><div class="message" id="message"></div></div><div class="controls" id="controls"><div class="pad" id="pad"><div class="knob" id="knob"></div></div><div class="actions"><button class="btn" id="lock">锁定</button><button class="btn" id="block">格挡</button><button class="btn" id="dodge">闪避</button><button class="btn" id="heavy">重击</button><button class="btn" id="attack">斩击</button></div></div><div id="toast"></div><div class="overlay" id="menu"><div class="card"><div class="eyebrow">A DARK ACTION JOURNEY · REALTIME 3D</div><h1>ASHEN OATH</h1><div class="cn">灰 烬 誓 约</div><p class="desc">王国沉入灰烬之后，誓言仍在盔甲深处燃烧。穿过三片失落之地，击败守门者，走向王座深渊。<br><br>观察敌人的起手，抓住弹反时机。贪刀会死，犹豫也会死。</p><button class="primary" id="start">开始远征</button><div class="hint">第三人称实时 3D · 横屏体验<br>左侧摇杆移动，右侧按钮战斗。键盘 WASD / J / L / K / Space<br>程序化 3D 场景与骑士模型 · 推荐 Fold7 横屏展开</div></div></div><div class="overlay hidden" id="end"><div class="card"><div class="eyebrow" id="endtag"></div><h1 id="endtitle"></h1><p class="desc" id="enddesc"></p><button class="primary" id="again">再次远征</button></div></div><div class="rotate">请将 Galaxy Z Fold7 横向展开<br><br>旋转屏幕以获得完整战斗视野</div></main>
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+const $=id=>document.getElementById(id),root=$("view");
+let scene,camera,renderer,clock,raf=0,running=false,started=false,stage=0,kills=0,lockOn=true,toastT=0,msgT=0,shake=0,combo=0,comboT=0;
+const chapters=[["I · 灰烬庭院","断誓守卫 · VARG",360,16,1.1],["II · 断裂回廊","赤痕审判官 · MORD",490,19,1.25],["III · 王座深渊","灰烬君王 · ODRAN",680,23,1.4]];
+const inp={x:0,y:0,keys:{}};const p={hp:100,st:100,attack:0,kind:0,hit:false,dodge:0,inv:0,block:false,parry:0,stun:0};
+const material=(c,r=.65,m=.25)=>new THREE.MeshStandardMaterial({color:c,roughness:r,metalness:m});
+const armor=material(0x384047,.42,.75),trim=material(0xa48a5e,.4,.7),dark=material(0x171c20,.9),capeMat=material(0x49201d),steel=material(0xbfc2bd,.28,.85),stone=material(0x353637,1);
+function mesh(g,geo,mat,x,y,z){const o=new THREE.Mesh(geo,mat);o.position.set(x,y,z);o.castShadow=true;o.receiveShadow=true;g.add(o);return o}
+function limb(g,a,b,r1,r2,mat){const A=new THREE.Vector3(...a),B=new THREE.Vector3(...b),d=B.clone().sub(A),o=mesh(g,new THREE.CylinderGeometry(r2,r1,d.length(),10),mat,0,0,0);o.position.copy(A.add(B).multiplyScalar(.5));o.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),d.normalize());return o}
+function knight(isBoss=false){const g=new THREE.Group(),am=isBoss?material(0x49302d,.4,.7):armor,cl=isBoss?material(0x571e18):capeMat;
+mesh(g,new THREE.BoxGeometry(.7,.9,.3),cl,0,.95,-.18);mesh(g,new THREE.BoxGeometry(.78,.78,.48),am,0,1.4,0);mesh(g,new THREE.BoxGeometry(.5,.07,.04),trim,0,1.08,.25);
+mesh(g,new THREE.SphereGeometry(.34,16,12),am,0,1.98,0);mesh(g,new THREE.BoxGeometry(.36,.06,.06),dark,0,1.94,.31);mesh(g,new THREE.BoxGeometry(.22,.025,.025),material(0xe08b51),0,1.94,.35);
+for(const s of [-1,1]){mesh(g,new THREE.SphereGeometry(.23,12,10),am,s*.49,1.52,0).scale.set(1.2,.8,1);limb(g,[s*.5,1.48,0],[s*.7,1.02,.06],.15,.11,am);limb(g,[s*.22,.9,0],[s*.27,.22,0],.16,.12,am);mesh(g,new THREE.BoxGeometry(.34,.18,.48),dark,s*.27,.15,.08)}
+const sword=new THREE.Group();sword.position.set(.77,1.1,.05);mesh(sword,new THREE.BoxGeometry(.08,.9,.05),steel,0,.48,0);mesh(sword,new THREE.BoxGeometry(.4,.07,.1),trim,0,.1,0);mesh(sword,new THREE.BoxGeometry(.13,.15,.14),trim,0,-.02,0);g.add(sword);g.userData.sword=sword;mesh(g,new THREE.BoxGeometry(.68,1.05,.06),cl,0,1.04,-.32).rotation.x=-.15;return g}
+function init(){scene=new THREE.Scene();scene.background=new THREE.Color(0x11171c);scene.fog=new THREE.FogExp2(0x11171c,.027);camera=new THREE.PerspectiveCamera(52,innerWidth/innerHeight,.1,100);camera.position.set(0,5,11);renderer=new THREE.WebGLRenderer({antialias:true,powerPreference:"high-performance"});renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5));renderer.setSize(innerWidth,innerHeight);renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;renderer.outputColorSpace=THREE.SRGBColorSpace;renderer.toneMapping=THREE.ACESFilmicToneMapping;renderer.toneMappingExposure=1.15;root.appendChild(renderer.domElement);
+scene.add(new THREE.HemisphereLight(0x9eafc2,0x17110d,1.4));const sun=new THREE.DirectionalLight(0xe6d6b8,3.2);sun.position.set(-5,10,6);sun.castShadow=true;sun.shadow.mapSize.set(1024,1024);scene.add(sun);const fire=new THREE.PointLight(0xc45b36,22,20);fire.position.set(2,3,-4);scene.add(fire);
+mesh(scene,new THREE.CircleGeometry(16,96),stone,0,-.06,0).rotation.x=-Math.PI/2;const ring=mesh(scene,new THREE.RingGeometry(11.8,12.05,96),new THREE.MeshBasicMaterial({color:0x887354,transparent:true,opacity:.45,side:THREE.DoubleSide}),0,.01,0);ring.rotation.x=-Math.PI/2;
+for(let i=0;i<28;i++){const a=i/28*Math.PI*2,r=12.5+(i%3)*.4,h=1.5+(i*7%5)*.55;const q=mesh(scene,new THREE.BoxGeometry(.8,h,.9),stone,Math.cos(a)*r,h/2,Math.sin(a)*r);q.rotation.y=a;q.rotation.z=i%2?.08:-.1;const l=new THREE.PointLight(0xb65d32,.4,3);l.position.set(q.position.x,.8,q.position.z);scene.add(l)}
+for(let i=0;i<70;i++){const a=Math.random()*Math.PI*2,r=4+Math.random()*14;mesh(scene,new THREE.SphereGeometry(.025+Math.random()*.025,5,5),new THREE.MeshBasicMaterial({color:0xc18a5b}),Math.cos(a)*r,.4+Math.random()*4,Math.sin(a)*r)}
 }
-function shadow(x,y,r){ctx.fillStyle="#0009";ctx.beginPath();ctx.ellipse(x,y+13,r*1.2,r*.45,0,0,Math.PI*2);ctx.fill()}
-function drawKnight(x,y,scale,angle,red=false,flash=0){ctx.save();ctx.translate(x,y);ctx.rotate(angle);ctx.scale(scale,scale);shadow(0,0,18);
- let metal=flash>0?"#fff":red?"#58312c":"#454c50",edge=red?"#c26a4c":"#b5a17c";
- // cape
- ctx.fillStyle=red?"#481d19":"#482622";ctx.beginPath();ctx.moveTo(-10,-8);ctx.lineTo(-20,22);ctx.lineTo(0,28);ctx.lineTo(12,10);ctx.closePath();ctx.fill();
- // legs
- ctx.fillStyle="#20272a";ctx.fillRect(-10,3,8,19);ctx.fillRect(3,3,8,19);
- ctx.fillStyle=metal;ctx.fillRect(-12,14,11,8);ctx.fillRect(2,14,11,8);
- // torso
- ctx.fillStyle=metal;ctx.beginPath();ctx.moveTo(-13,-13);ctx.lineTo(-10,-2);ctx.lineTo(-8,8);ctx.lineTo(8,8);ctx.lineTo(12,-4);ctx.lineTo(13,-13);ctx.closePath();ctx.fill();
- ctx.strokeStyle=edge;ctx.lineWidth=2;ctx.stroke();
- // shoulder armor
- ctx.fillStyle=metal;ctx.beginPath();ctx.arc(-14,-10,7,0,Math.PI*2);ctx.arc(14,-10,7,0,Math.PI*2);ctx.fill();
- // helmet
- ctx.fillStyle=metal;ctx.beginPath();ctx.moveTo(-9,-22);ctx.lineTo(-7,-34);ctx.lineTo(0,-39);ctx.lineTo(8,-33);ctx.lineTo(10,-22);ctx.closePath();ctx.fill();ctx.stroke();
- ctx.fillStyle=red?"#f07a48":"#d88c55";ctx.fillRect(-6,-28,12,2.5);
- // sword
- ctx.save();ctx.rotate(-.65);ctx.fillStyle=edge;ctx.fillRect(13,-12,3,27);ctx.fillStyle="#c5c7c2";ctx.fillRect(14,-31,2.5,22);ctx.restore();
- ctx.restore()}
-function drawEnemy(){if(enemy.dead)return;let dx=player.x-enemy.x,dy=player.y-enemy.y;let a=Math.atan2(dy,dx);if(enemy.phase==="windup"){ctx.strokeStyle="#c65c43";ctx.lineWidth=3;ctx.globalAlpha=.45+.35*Math.sin(time*16);ctx.beginPath();ctx.ellipse(enemy.x,enemy.y+8,58,22,0,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
- if(enemy.phase==="slam"){ctx.strokeStyle="#e29b61";ctx.lineWidth=4;ctx.globalAlpha=.55;ctx.beginPath();ctx.arc(enemy.x,enemy.y,enemy.attack*120,0,Math.PI*2);ctx.stroke();ctx.globalAlpha=1}
- if(lockOn){ctx.strokeStyle="#d3b47b88";ctx.lineWidth=1;ctx.beginPath();ctx.arc(enemy.x,enemy.y+8,30,0,Math.PI*2);ctx.stroke()}
- drawKnight(enemy.x,enemy.y,1.35,a+Math.PI,stage>0,enemy.flash)}
-function drawPlayer(){let a=player.face;drawKnight(player.x,player.y,1,a,false,player.flash);
- if(player.attack>0){ctx.save();ctx.translate(player.x,player.y);ctx.strokeStyle=player.attackKind===1?"#f4d18b":"#d5dce0";ctx.lineWidth=player.attackKind===1?5:3;ctx.globalAlpha=clamp(player.attack*2,0,1);ctx.beginPath();ctx.arc(0,0,player.attackKind===1?65:49,a-.9,a+.9);ctx.stroke();ctx.restore()}
- if(player.dodge>0){ctx.strokeStyle="#d7c18b77";ctx.lineWidth=2;ctx.beginPath();ctx.arc(player.x,player.y,28,0,Math.PI*2);ctx.stroke()}}
-function update(dt){
- time+=dt;
- let mx=input.x,my=input.y;
- if(input.keys.KeyW||input.keys.ArrowUp)my-=1;
- if(input.keys.KeyS||input.keys.ArrowDown)my+=1;
- if(input.keys.KeyA||input.keys.ArrowLeft)mx-=1;
- if(input.keys.KeyD||input.keys.ArrowRight)mx+=1;
- let len=Math.hypot(mx,my);
- if(len>1){mx/=len;my/=len}
- player.invuln=Math.max(0,player.invuln-dt);
- player.dodge=Math.max(0,player.dodge-dt);
- player.parry=Math.max(0,player.parry-dt);
- player.stun=Math.max(0,player.stun-dt);
- player.flash=Math.max(0,player.flash-dt);
- player.attack=Math.max(0,player.attack-dt);
- comboTimer=Math.max(0,comboTimer-dt);
- if(comboTimer<=0)combo=0;
- player.st=Math.min(100,player.st+(player.block?4:13)*dt);
- if(player.stun<=0&&!player.block&&player.dodge<=0){
-  const speed=190;
-  player.x+=mx*speed*dt;player.y+=my*speed*dt;
-  if(len>.1)player.face=Math.atan2(my,mx);
-  else if(lockOn&&!enemy.dead)player.face=Math.atan2(enemy.y-player.y,enemy.x-player.x);
- }
- player.x=clamp(player.x,W*.12,W*.88);player.y=clamp(player.y,H*.24,H*.86);
- if(player.block&&player.st>0)player.st=Math.max(0,player.st-8*dt);
- if(player.attack>0&&!player.attackHit&&player.attack<.22){
-  const d=dist(player,enemy);
-  if(d<82&&!enemy.dead){
-   const dmg=player.attackKind===1?66:[28,34,45][combo%3];
-   enemy.hp=Math.max(0,enemy.hp-dmg);enemy.flash=.14;player.attackHit=true;shake=5;
-   toast(player.attackKind===1?"重斩命中":"命中");
-   if(enemy.hp<=0)bossDown();
-  }
- }
- if(!enemy.dead){
-  enemy.flash=Math.max(0,enemy.flash-dt);
-  const d=dist(player,enemy),ang=Math.atan2(player.y-enemy.y,player.x-enemy.x);
-  enemy.angle=ang;
-  if(enemy.phase==="idle"){
-   if(d>58){enemy.x+=Math.cos(ang)*Math.min(d-52,65)*dt*.9;enemy.y+=Math.sin(ang)*Math.min(d-52,65)*dt*.9}
-   enemy.timer-=dt;
-   if(enemy.timer<=0&&d<250){enemy.phase="windup";enemy.timer=stage===2?0.78:0.95;enemy.pattern=(enemy.pattern+1)%3;say("敌人蓄力 · 准备格挡或闪避")}
-  }else if(enemy.phase==="windup"){
-   enemy.timer-=dt;
-   if(enemy.timer<=0){enemy.phase="strike";enemy.timer=.28;enemy.attack=0}
-  }else if(enemy.phase==="strike"){
-   enemy.timer-=dt;enemy.attack=1-enemy.timer/.28;
-   if(enemy.timer<=0){
-    const dx=player.x-enemy.x,dy=player.y-enemy.y,dd=Math.hypot(dx,dy);
-    const dot=(dx*Math.cos(ang)+dy*Math.sin(ang))/(dd||1);
-    const reach=enemy.pattern===2?118:88;
-    if(dd<reach&&dot>.1){
-     if(player.parry>0){enemy.phase="stagger";enemy.timer=1.15;enemy.hp=Math.max(0,enemy.hp-52);toast("完美弹反！");shake=8}
-     else if(player.dodge>0||player.invuln>0){toast("闪避成功")}
-     else if(player.block&&player.st>12){player.st-=14;player.hp-=stages[stage].damage*.18;toast("格挡")}
-     else{player.hp-=stages[stage].damage*(enemy.pattern===2?1.35:1);player.stun=.35;player.flash=.2;shake=11;toast("受到重创")}
-    }
-    if(enemy.hp<=0)bossDown();
-    else if(enemy.phase==="strike"){enemy.phase="recover";enemy.timer=.75}
-   }
-  }else if(enemy.phase==="recover"||enemy.phase==="stagger"){
-   enemy.timer-=dt;
-   if(enemy.timer<=0){enemy.phase="idle";enemy.timer=stage===2?0.85:1.2}
-  }
- }
- if(player.hp<=0){player.hp=0;finish(false)}
- $("hp").style.width=player.hp+"%";$("st").style.width=player.st+"%";
- $("hpv").textContent=Math.ceil(player.hp)+" / 100";$("stv").textContent=Math.ceil(player.st)+" / 100";
- $("boss").style.width=(enemy.hp/enemy.maxHp*100)+"%";
- if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$("toast").style.opacity=0}
- if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)$("message").style.opacity=0}
-}
-function bossDown(){if(enemy.dead)return;enemy.dead=true;kills++;$("bossbox").style.display="none";toast("守门者已陨落");setTimeout(()=>{if(stage<2){stage++;player.hp=Math.min(100,player.hp+28);player.st=100;resetEnemy();stageTitle();say("新的誓约在前方等待")}else finish(true)},1800)}
-function finish(win){running=false;$("controls").style.display="none";$("end").classList.remove("hidden");$("endtag").textContent=win?"THE OATH IS FULFILLED":"THE ASHES CLAIM YOU";$("endtitle").textContent=win?"战役完成":"远征终止";$("enddesc").textContent=win?"三位守门者已经倒下。你穿过灰烬，抵达王座深渊。击倒数："+kills+"。":"你倒在第 "+(stage+1)+" 片失落之地。记住敌人的起手，再次挑战。击倒数："+kills+"。"}
-function loop(now){if(!running)return;let dt=Math.min((now-last)/1000,.035);last=now;update(dt);render();requestAnimationFrame(loop)}
-function render(){ctx.clearRect(0,0,W,H);world();if(shake>0){ctx.save();ctx.translate((Math.random()-.5)*shake,(Math.random()-.5)*shake);shake*=.84;if(shake<.3)shake=0}drawEnemy();drawPlayer();ctx.restore?.();if(lockOn&&!enemy.dead){ctx.fillStyle="#e0c995";ctx.font="11px Georgia";ctx.textAlign="center";ctx.fillText("锁定目标",enemy.x,enemy.y-54)}}
-function attack(kind){if(!running||player.attack>0||player.dodge>0||player.stun>0)return;let cost=kind?28:10;if(player.st<cost){toast("精力不足");return}player.st-=cost;player.attack=kind ? 0.55 : 0.42;player.attackKind=kind;player.attackHit=false;if(!kind){combo=(combo+1)%3;comboTimer=.72}else combo=0;player.face=Math.atan2(enemy.y-player.y,enemy.x-player.x)}
-function dodge(){if(!running||player.st<24||player.dodge>0)return;player.st-=24;let mx=input.x,my=input.y;if(Math.hypot(mx,my)<.1){mx=Math.cos(player.face);my=Math.sin(player.face)}let l=Math.hypot(mx,my)||1;player.vx=mx/l*420;player.vy=my/l*420;player.dodge=.34;player.invuln=.38;player.x=clamp(player.x+player.vx*.32,W*.12,W*.88);player.y=clamp(player.y+player.vy*.32,H*.24,H*.86);toast("闪避")}
-function setBlock(v){player.block=v;if(v&&player.st>0)player.parry=.22}
-function bind(id,down,up){let el=$(id);el.addEventListener("pointerdown",e=>{e.preventDefault();el.classList.add("down");el.setPointerCapture(e.pointerId);down()});for(let ev of ["pointerup","pointercancel","lostpointercapture"])el.addEventListener(ev,e=>{el.classList.remove("down");up?.()})}
-bind("attack",()=>attack(0));bind("heavy",()=>attack(1));bind("dodge",dodge);bind("block",()=>setBlock(true),()=>setBlock(false));bind("lock",()=>{lockOn=!lockOn;toast(lockOn?"目标锁定":"解除锁定")});
-const pad=$("pad"),knob=$("knob");let padId=null,origin={x:0,y:0};
-pad.addEventListener("pointerdown",e=>{e.preventDefault();padId=e.pointerId;pad.setPointerCapture(padId);let r=pad.getBoundingClientRect();origin={x:r.left+r.width/2,y:r.top+r.height/2};movePad(e)});
-pad.addEventListener("pointermove",e=>{if(e.pointerId===padId)movePad(e)});
-function movePad(e){let dx=e.clientX-origin.x,dy=e.clientY-origin.y,l=Math.hypot(dx,dy),max=pad.clientWidth*.34;if(l>max){dx*=max/l;dy*=max/l}input.x=dx/max;input.y=dy/max;knob.style.transform="translate("+dx+"px,"+dy+"px)"}
-function endPad(e){if(e.pointerId===padId){padId=null;input.x=input.y=0;knob.style.transform="translate(0,0)"}}
-for(let ev of ["pointerup","pointercancel","lostpointercapture"])pad.addEventListener(ev,endPad);
-addEventListener("keydown",e=>{input.keys[e.code]=true;if(["Space","Tab"].includes(e.code))e.preventDefault();if(e.repeat)return;if(e.code==="KeyJ")attack(0);if(e.code==="KeyL")attack(1);if(e.code==="Space")dodge();if(e.code==="KeyK")setBlock(true);if(e.code==="Tab"){lockOn=!lockOn;toast(lockOn?"目标锁定":"解除锁定")}});
-addEventListener("keyup",e=>{input.keys[e.code]=false;if(e.code==="KeyK")setBlock(false)});
-document.addEventListener("visibilitychange",()=>{if(document.hidden&&running){running=false;toast("已暂停 · 返回页面继续");}else if(!document.hidden&&started&&!$("end").classList.contains("hidden")===false){running=true;last=performance.now();requestAnimationFrame(loop)}});
+const hero=knight(),foe=knight(true);scene.add(hero,foe);hero.position.set(0,0,5);
+let e={hp:360,max:360,phase:"idle",t:1.4,pattern:0,dead:false};
+function resize(){if(!renderer)return;camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);renderer.setPixelRatio(Math.min(devicePixelRatio||1,1.5))}addEventListener("resize",resize);
+function toast(s){$("toast").textContent=s;$("toast").style.opacity=1;toastT=1.2}function say(s){$("message").textContent=s;$("message").style.opacity=1;msgT=1.3}function title(){const n=$("stage");n.textContent=chapters[stage][0];n.style.opacity=1;setTimeout(()=>n.style.opacity=0,2200)}
+function resetEnemy(){const c=chapters[stage];e={hp:c[2],max:c[2],phase:"idle",t:1.4,pattern:0,dead:false};foe.visible=true;foe.position.set(0,0,-3);foe.scale.setScalar(1.35+stage*.12);$("bossname").textContent=c[1];$("bossbox").style.display="block"}
+function start(){stage=0;kills=0;p.hp=100;p.st=100;p.attack=0;p.dodge=0;p.inv=0;hero.position.set(0,0,5);resetEnemy();$("menu").classList.add("hidden");$("end").classList.add("hidden");$("controls").style.display="block";started=running=true;clock.start();title();cancelAnimationFrame(raf);loop()}
+$("start").onclick=start;$("again").onclick=start;
+function dist(){return hero.position.distanceTo(foe.position)}
+function attack(k){if(!running||p.attack>0||p.dodge>0||p.stun>0)return;let cost=k?28:10;if(p.st<cost){toast("精力不足");return}p.st-=cost;p.attack=k?.62:.42;p.kind=k;p.hit=false;if(!k){combo=(combo+1)%3;comboT=.7}else combo=0;hero.userData.sword.rotation.z=-1.2}
+function dodge(){if(!running||p.st<24||p.dodge>0)return;p.st-=24;let x=inp.x,y=inp.y;if(Math.hypot(x,y)<.1){x=Math.sin(hero.rotation.y);y=Math.cos(hero.rotation.y)}let l=Math.hypot(x,y)||1;hero.userData.dx=x/l;hero.userData.dz=y/l;p.dodge=.34;p.inv=.4;toast("闪避")}
+function block(v){p.block=v;if(v)p.parry=.22}
+function bind(id,down,up){let b=$(id);b.addEventListener("pointerdown",ev=>{ev.preventDefault();b.classList.add("down");b.setPointerCapture(ev.pointerId);down()});["pointerup","pointercancel","lostpointercapture"].forEach(ev=>b.addEventListener(ev,()=>{b.classList.remove("down");if(up)up()}))}
+bind("attack",()=>attack(0));bind("heavy",()=>attack(1));bind("dodge",dodge);bind("block",()=>block(true),()=>block(false));bind("lock",()=>{lockOn=!lockOn;toast(lockOn?"目标锁定":"解除锁定")});
+const pad=$("pad"),knob=$("knob");let pid=null,org={x:0,y:0};pad.addEventListener("pointerdown",ev=>{ev.preventDefault();pid=ev.pointerId;pad.setPointerCapture(pid);let r=pad.getBoundingClientRect();org={x:r.left+r.width/2,y:r.top+r.height/2};movePad(ev)});pad.addEventListener("pointermove",ev=>{if(ev.pointerId===pid)movePad(ev)});function movePad(ev){let x=ev.clientX-org.x,y=ev.clientY-org.y,l=Math.hypot(x,y),m=pad.clientWidth*.34;if(l>m){x*=m/l;y*=m/l}inp.x=x/m;inp.y=y/m;knob.style.transform="translate("+x+"px,"+y+"px)"}function endPad(ev){if(ev.pointerId===pid){pid=null;inp.x=inp.y=0;knob.style.transform="translate(0,0)"}}["pointerup","pointercancel","lostpointercapture"].forEach(ev=>pad.addEventListener(ev,endPad));
+addEventListener("keydown",ev=>{inp.keys[ev.code]=true;if(["Space","Tab"].includes(ev.code))ev.preventDefault();if(ev.repeat)return;if(ev.code==="KeyJ")attack(0);if(ev.code==="KeyL")attack(1);if(ev.code==="Space")dodge();if(ev.code==="KeyK")block(true);if(ev.code==="Tab"){lockOn=!lockOn;toast(lockOn?"目标锁定":"解除锁定")}});addEventListener("keyup",ev=>{inp.keys[ev.code]=false;if(ev.code==="KeyK")block(false)});
+function finish(win){running=false;$("controls").style.display="none";$("end").classList.remove("hidden");$("endtag").textContent=win?"THE OATH IS FULFILLED":"THE ASHES CLAIM YOU";$("endtitle").textContent=win?"战役完成":"远征终止";$("enddesc").textContent=win?"三位守门者已经倒下。击倒数："+kills+"。":"你倒在第 "+(stage+1)+" 片失落之地。击倒数："+kills+"。"}
+function bossDown(){if(e.dead)return;e.dead=true;kills++;foe.visible=false;$("bossbox").style.display="none";toast("守门者已陨落");setTimeout(()=>{if(stage<2){stage++;p.hp=Math.min(100,p.hp+28);p.st=100;resetEnemy();title();say("新的誓约在前方等待")}else finish(true)},1500)}
+function update(dt){let x=inp.x,y=inp.y;if(inp.keys.KeyW||inp.keys.ArrowUp)y--;if(inp.keys.KeyS||inp.keys.ArrowDown)y++;if(inp.keys.KeyA||inp.keys.ArrowLeft)x--;if(inp.keys.KeyD||inp.keys.ArrowRight)x++;let l=Math.hypot(x,y);if(l>1){x/=l;y/=l}p.inv=Math.max(0,p.inv-dt);p.dodge=Math.max(0,p.dodge-dt);p.parry=Math.max(0,p.parry-dt);p.stun=Math.max(0,p.stun-dt);p.attack=Math.max(0,p.attack-dt);comboT=Math.max(0,comboT-dt);p.st=Math.min(100,p.st+(p.block?3:12)*dt);
+if(p.stun<=0&&!p.block){if(p.dodge>0){hero.position.x+=hero.userData.dx*13*dt;hero.position.z+=hero.userData.dz*13*dt}else{hero.position.x+=x*5.2*dt;hero.position.z+=y*5.2*dt}if(l>.1)hero.rotation.y=Math.atan2(x,y);else if(lockOn)hero.rotation.y=Math.atan2(foe.position.x-hero.position.x,foe.position.z-hero.position.z)}
+hero.position.x=THREE.MathUtils.clamp(hero.position.x,-9,9);hero.position.z=THREE.MathUtils.clamp(hero.position.z,-9,9);if(p.block)p.st=Math.max(0,p.st-7*dt);
+if(p.attack>0){hero.userData.sword.rotation.z=THREE.MathUtils.lerp(hero.userData.sword.rotation.z,-.1,dt*10);if(!p.hit&&p.attack<.22&&dist()<2.7){e.hp=Math.max(0,e.hp-(p.kind?68:[27,34,44][combo%3]));p.hit=true;shake=.13;toast("命中");if(e.hp<=0)bossDown()}}
+if(!e.dead){let v=hero.position.clone().sub(foe.position),d=v.length(),dir=v.normalize();foe.rotation.y=Math.atan2(dir.x,dir.z);if(e.phase==="idle"){if(d>2.2)foe.position.addScaledVector(dir,Math.min(d-2.1,2.6)*dt*chapters[stage][4]);e.t-=dt;if(e.t<=0&&d<8.5){e.phase="windup";e.t=stage===2?.72:.95;e.pattern=(e.pattern+1)%3;say("敌人蓄力 · 准备格挡或闪避")}}else if(e.phase==="windup"){e.t-=dt;foe.userData.sword.rotation.z=-1.1;if(e.t<=0){e.phase="strike";e.t=.32}}else if(e.phase==="strike"){e.t-=dt;if(e.t<=0){if(d<(e.pattern===2?3.5:2.8)){if(p.parry>0){e.phase="stagger";e.t=1.05;e.hp=Math.max(0,e.hp-54);toast("完美弹反！")}else if(p.dodge>0||p.inv>0)toast("闪避成功");else if(p.block&&p.st>12){p.st-=15;p.hp-=chapters[stage][3]*.18;toast("格挡")}else{p.hp-=chapters[stage][3]*(e.pattern===2?1.35:1);p.stun=.32;shake=.24;toast("受到重创")}}if(e.hp<=0)bossDown();else if(e.phase==="strike"){e.phase="recover";e.t=.82}foe.userData.sword.rotation.z=0}}else if(e.phase==="recover"||e.phase==="stagger"){e.t-=dt;if(e.t<=0){e.phase="idle";e.t=stage===2?.85:1.2}}}
+if(p.hp<=0){p.hp=0;finish(false)}$("hp").style.width=p.hp+"%";$("st").style.width=p.st+"%";$("hpv").textContent=Math.ceil(p.hp)+" / 100";$("stv").textContent=Math.ceil(p.st)+" / 100";$("boss").style.width=e.hp/e.max*100+"%";if(toastT>0&&((toastT-=dt)<=0))$("toast").style.opacity=0;if(msgT>0&&((msgT-=dt)<=0))$("message").style.opacity=0}
+function draw(dt){let aim=hero.position.clone().add(new THREE.Vector3(0,1.1,0)),offset=new THREE.Vector3(Math.sin(hero.rotation.y)*7,4.1,Math.cos(hero.rotation.y)*7);camera.position.lerp(aim.clone().add(offset),1-Math.pow(.001,dt));camera.lookAt(aim.clone().add(new THREE.Vector3(0,.2,-1)));if(lockOn&&foe.visible){let mid=hero.position.clone().lerp(foe.position,.4);camera.lookAt(mid.x,1,mid.z)}if(shake>0){camera.position.x+=(Math.random()-.5)*shake;shake=Math.max(0,shake-dt)}renderer.render(scene,camera)}
+function loop(){if(!running)return;raf=requestAnimationFrame(loop);let dt=Math.min(clock.getDelta(),.04);update(dt);draw(dt)}
+try{init();clock=new THREE.Clock()}catch(err){$("menu").innerHTML='<div class="card"><h1>3D 初始化失败</h1><p class="desc">浏览器无法创建 WebGL 场景。请使用最新版 Chrome 或 Samsung Internet，并开启硬件加速。</p></div>';console.error(err)}
+document.addEventListener("visibilitychange",()=>{if(document.hidden&&running){running=false;cancelAnimationFrame(raf)}else if(!document.hidden&&started&&!$("end").classList.contains("hidden")===false){running=true;clock.start();loop()}});
 $("controls").style.display="none";
-})();
 </script></main></body></html>
