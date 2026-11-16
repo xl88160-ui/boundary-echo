@@ -125,27 +125,78 @@ function drawEnemy(){if(enemy.dead)return;let dx=player.x-enemy.x,dy=player.y-en
 function drawPlayer(){let a=player.face;drawKnight(player.x,player.y,1,a,false,player.flash);
  if(player.attack>0){ctx.save();ctx.translate(player.x,player.y);ctx.strokeStyle=player.attackKind===1?"#f4d18b":"#d5dce0";ctx.lineWidth=player.attackKind===1?5:3;ctx.globalAlpha=clamp(player.attack*2,0,1);ctx.beginPath();ctx.arc(0,0,player.attackKind===1?65:49,a-.9,a+.9);ctx.stroke();ctx.restore()}
  if(player.dodge>0){ctx.strokeStyle="#d7c18b77";ctx.lineWidth=2;ctx.beginPath();ctx.arc(player.x,player.y,28,0,Math.PI*2);ctx.stroke()}}
-function update(dt){time+=dt;let mx=input.x,my=input.y;
- if(input.keys.KeyW||input.keys.ArrowUp)my-=1;if(input.keys.KeyS||input.keys.ArrowDown)my+=1;if(input.keys.KeyA||input.keys.ArrowLeft)mx-=1;if(input.keys.KeyD||input.keys.ArrowRight)mx+=1;
- let len=Math.hypot(mx,my);if(len>1){mx/=len;my/=len}
- player.invuln=Math.max(0,player.invuln-dt);player.dodge=Math.max(0,player.dodge-dt);player.parry=Math.max(0,player.parry-dt);player.stun=Math.max(0,player.stun-dt);player.flash=Math.max(0,player.flash-dt);player.attack=Math.max(0,player.attack-dt);comboTimer=Math.max(0,comboTimer-dt);if(comboTimer<=0)combo=0;
- player.st=Math.min(100,player.st+((player.block?4:13)*dt));
- if(player.stun<=0&&!player.block&&player.dodge<=0){let speed=player.dodge>0?360:190;player.x+=mx*speed*dt;player.y+=my*speed*dt;if(len>.1)player.face=Math.atan2(my,mx);else if(lockOn&&!enemy.dead)player.face=Math.atan2(enemy.y-player.y,enemy.x-player.x)}
+function update(dt){
+ time+=dt;
+ let mx=input.x,my=input.y;
+ if(input.keys.KeyW||input.keys.ArrowUp)my-=1;
+ if(input.keys.KeyS||input.keys.ArrowDown)my+=1;
+ if(input.keys.KeyA||input.keys.ArrowLeft)mx-=1;
+ if(input.keys.KeyD||input.keys.ArrowRight)mx+=1;
+ let len=Math.hypot(mx,my);
+ if(len>1){mx/=len;my/=len}
+ player.invuln=Math.max(0,player.invuln-dt);
+ player.dodge=Math.max(0,player.dodge-dt);
+ player.parry=Math.max(0,player.parry-dt);
+ player.stun=Math.max(0,player.stun-dt);
+ player.flash=Math.max(0,player.flash-dt);
+ player.attack=Math.max(0,player.attack-dt);
+ comboTimer=Math.max(0,comboTimer-dt);
+ if(comboTimer<=0)combo=0;
+ player.st=Math.min(100,player.st+(player.block?4:13)*dt);
+ if(player.stun<=0&&!player.block&&player.dodge<=0){
+  const speed=190;
+  player.x+=mx*speed*dt;player.y+=my*speed*dt;
+  if(len>.1)player.face=Math.atan2(my,mx);
+  else if(lockOn&&!enemy.dead)player.face=Math.atan2(enemy.y-player.y,enemy.x-player.x);
+ }
  player.x=clamp(player.x,W*.12,W*.88);player.y=clamp(player.y,H*.24,H*.86);
  if(player.block&&player.st>0)player.st=Math.max(0,player.st-8*dt);
- if(player.attack>0&&!player.attackHit&&player.attack<.22){let d=dist(player,enemy);if(d<82&&!enemy.dead){let dmg=player.attackKind===1?66:([28,34,45][combo%3]);enemy.hp=Math.max(0,enemy.hp-dmg);enemy.flash=.14;enemy.attackHit=true;shake=5;toast(player.attackKind===1?"重斩命中":"命中");if(enemy.hp<=0)bossDown()}}
- if(!enemy.dead){enemy.flash=Math.max(0,enemy.flash-dt);let d=dist(player,enemy),ang=Math.atan2(player.y-enemy.y,player.x-enemy.x);enemy.angle=ang;
-  if(enemy.phase==="idle"){enemy.x+=Math.cos(ang)*Math.min(d-52,65)*dt*.9;enemy.y+=Math.sin(ang)*Math.min(d-52,65)*dt*.9;enemy.timer-=dt;if(enemy.timer<=0&&d<250){enemy.phase="windup";enemy.timer=stage===2 ? 0.78 : 0.95;enemy.pattern=(enemy.pattern+1)%3;say(["守卫蓄力 · 准备格挡或闪避","危险攻击 · 注意距离","重击预警"][enemy.pattern])}}
-  else if(enemy.phase==="windup"){enemy.timer-=dt;if(enemy.timer<=0){enemy.phase="strike";enemy.timer=.28;enemy.attack=0}}
-  else if(enemy.phase==="strike"){enemy.timer-=dt;enemy.attack=1-enemy.timer/.28;if(enemy.timer<=0){let hit=false;let dx=player.x-enemy.x,dy=player.y-enemy.y;let dd=Math.hypot(dx,dy);let dot=(dx*Math.cos(ang)+dy*Math.sin(ang))/(dd||1);
-    let reach=enemy.pattern===2?118:88;if(dd<reach&&dot>.1){if(player.parry>0){enemy.phase="stagger";enemy.timer=1.15;enemy.hp=Math.max(0,enemy.hp-52);toast("完美弹反！");shake=8}else if(player.dodge>0||player.invuln>0){toast("闪避成功")}else if(player.block&&player.st>12){player.st-=14;player.hp-=stages[stage].damage*.18;toast("格挡");}else{player.hp-=stages[stage].damage*(enemy.pattern===2?1.35:1);player.stun=.35;player.flash=.2;shake=11;toast("受到重创")}}
-    if(enemy.hp<=0){bossDown()}else{enemy.phase="recover";enemy.timer=.75}}
-  }else if(enemy.phase==="recover"||enemy.phase==="stagger"){enemy.timer-=dt;if(enemy.timer<=0){enemy.phase="idle";enemy.timer=stage===2 ? 0.85 : 1.2}}
+ if(player.attack>0&&!player.attackHit&&player.attack<.22){
+  const d=dist(player,enemy);
+  if(d<82&&!enemy.dead){
+   const dmg=player.attackKind===1?66:[28,34,45][combo%3];
+   enemy.hp=Math.max(0,enemy.hp-dmg);enemy.flash=.14;player.attackHit=true;shake=5;
+   toast(player.attackKind===1?"重斩命中":"命中");
+   if(enemy.hp<=0)bossDown();
+  }
  }
+ if(!enemy.dead){
+  enemy.flash=Math.max(0,enemy.flash-dt);
+  const d=dist(player,enemy),ang=Math.atan2(player.y-enemy.y,player.x-enemy.x);
+  enemy.angle=ang;
+  if(enemy.phase==="idle"){
+   if(d>58){enemy.x+=Math.cos(ang)*Math.min(d-52,65)*dt*.9;enemy.y+=Math.sin(ang)*Math.min(d-52,65)*dt*.9}
+   enemy.timer-=dt;
+   if(enemy.timer<=0&&d<250){enemy.phase="windup";enemy.timer=stage===2?0.78:0.95;enemy.pattern=(enemy.pattern+1)%3;say("敌人蓄力 · 准备格挡或闪避")}
+  }else if(enemy.phase==="windup"){
+   enemy.timer-=dt;
+   if(enemy.timer<=0){enemy.phase="strike";enemy.timer=.28;enemy.attack=0}
+  }else if(enemy.phase==="strike"){
+   enemy.timer-=dt;enemy.attack=1-enemy.timer/.28;
+   if(enemy.timer<=0){
+    const dx=player.x-enemy.x,dy=player.y-enemy.y,dd=Math.hypot(dx,dy);
+    const dot=(dx*Math.cos(ang)+dy*Math.sin(ang))/(dd||1);
+    const reach=enemy.pattern===2?118:88;
+    if(dd<reach&&dot>.1){
+     if(player.parry>0){enemy.phase="stagger";enemy.timer=1.15;enemy.hp=Math.max(0,enemy.hp-52);toast("完美弹反！");shake=8}
+     else if(player.dodge>0||player.invuln>0){toast("闪避成功")}
+     else if(player.block&&player.st>12){player.st-=14;player.hp-=stages[stage].damage*.18;toast("格挡")}
+     else{player.hp-=stages[stage].damage*(enemy.pattern===2?1.35:1);player.stun=.35;player.flash=.2;shake=11;toast("受到重创")}
+    }
+    if(enemy.hp<=0)bossDown();
+    else if(enemy.phase==="strike"){enemy.phase="recover";enemy.timer=.75}
+   }
+  }else if(enemy.phase==="recover"||enemy.phase==="stagger"){
+   enemy.timer-=dt;
+   if(enemy.timer<=0){enemy.phase="idle";enemy.timer=stage===2?0.85:1.2}
+  }
  }
  if(player.hp<=0){player.hp=0;finish(false)}
- $("hp").style.width=player.hp+"%";$("st").style.width=player.st+"%";$("hpv").textContent=Math.ceil(player.hp)+" / 100";$("stv").textContent=Math.ceil(player.st)+" / 100";$("boss").style.width=(enemy.hp/enemy.maxHp*100)+"%";
- if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$("toast").style.opacity=0}if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)$("message").style.opacity=0}
+ $("hp").style.width=player.hp+"%";$("st").style.width=player.st+"%";
+ $("hpv").textContent=Math.ceil(player.hp)+" / 100";$("stv").textContent=Math.ceil(player.st)+" / 100";
+ $("boss").style.width=(enemy.hp/enemy.maxHp*100)+"%";
+ if(toastTimer>0){toastTimer-=dt;if(toastTimer<=0)$("toast").style.opacity=0}
+ if(messageTimer>0){messageTimer-=dt;if(messageTimer<=0)$("message").style.opacity=0}
 }
 function bossDown(){if(enemy.dead)return;enemy.dead=true;kills++;$("bossbox").style.display="none";toast("守门者已陨落");setTimeout(()=>{if(stage<2){stage++;player.hp=Math.min(100,player.hp+28);player.st=100;resetEnemy();stageTitle();say("新的誓约在前方等待")}else finish(true)},1800)}
 function finish(win){running=false;$("controls").style.display="none";$("end").classList.remove("hidden");$("endtag").textContent=win?"THE OATH IS FULFILLED":"THE ASHES CLAIM YOU";$("endtitle").textContent=win?"战役完成":"远征终止";$("enddesc").textContent=win?"三位守门者已经倒下。你穿过灰烬，抵达王座深渊。击倒数："+kills+"。":"你倒在第 "+(stage+1)+" 片失落之地。记住敌人的起手，再次挑战。击倒数："+kills+"。"}
